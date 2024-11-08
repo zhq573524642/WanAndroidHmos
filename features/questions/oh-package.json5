@@ -1,5 +1,5 @@
 {
-  "name": "mine",
+  "name": "questions",
   "version": "1.0.0",
   "description": "Please describe the basic information.",
   "main": "Index.ets",
@@ -12,7 +12,6 @@
     //模块通用组件
     "lib_components": "file:../lib_components",
     //登录模块
-    "login": "file:../login",
-    "questions": "file:../questions"
+    "login": "file:../login"
   }
 }

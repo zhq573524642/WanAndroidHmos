@@ -10,6 +10,7 @@
     "home": "file:../../features/home",
     "hmos": "file:../../features/hmos",
     "systems": "file:../../features/systems",
+    "questions": "file:../../features/questions",
     "mine": "file:../../features/mine",
     "login": "file:../../features/login"
   }

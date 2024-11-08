@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "questions",
+    "type": "har",
+    "routerMap": "$profile:router_map",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

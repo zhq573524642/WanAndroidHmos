@@ -1,15 +1,15 @@
 import { BasePage } from "commons"
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum"
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh"
-import { CollectionsBean, CollectionsList } from "../model/CollectionsBean"
 import { LengthMetrics } from "@kit.ArkUI"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import { ToastUtil } from "utils"
-import { CommonArticlesBean, CommonPagingBean, CommonTagsBean } from "lib_components"
+import { CommonArticlesBean, CommonPagingBean, CommonTagsBean, PageTitleComponent } from "lib_components"
 import mQuestionsViewModel from "../viewmodel/QuestionsViewModel"
 
 @Component
 export struct QuestionsPage {
+  @Consume('questionsPathStack') questionsPathStack: NavPathStack
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
@@ -23,38 +23,43 @@ export struct QuestionsPage {
   }
 
   build() {
-    Column() {
-
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        msgError: this.msgError,
-        isEnableStatePagePull: true,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ContentListView(_scroller)
-        },
-        onRefreshing: () => {
-          this.pageIndex = 0
-          this.requestQuestionsList()
-        },
-        onLoadingMore: () => {
-          if (this.isAllLoadOver) {
-            ToastUtil.showToast('暂无更多数据')
-            this.loadMoreStatus = FooterLoadMoreStatus.inactive
-            return
+    Navigation(this.questionsPathStack) {
+      Column() {
+        PageTitleComponent({
+          title: '问答',
+        })
+        BasePage({
+          pageState: this.pageState,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          msgError: this.msgError,
+          isEnableStatePagePull: true,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ContentListView(_scroller)
+          },
+          onRefreshing: () => {
+            this.pageIndex = 0
+            this.requestQuestionsList()
+          },
+          onLoadingMore: () => {
+            if (this.isAllLoadOver) {
+              ToastUtil.showToast('暂无更多数据')
+              this.loadMoreStatus = FooterLoadMoreStatus.inactive
+              return
+            }
+            this.requestQuestionsList()
+          },
+          onErrorRetryCallback: () => {
+            this.requestQuestionsList()
           }
-          this.requestQuestionsList()
-        },
-        onErrorRetryCallback: () => {
-          this.requestQuestionsList()
-        }
-      })
-        .layoutWeight(1)
-        .width('100%')
+        })
+          .layoutWeight(1)
+          .width('100%')
 
-    }.width('100%')
-    .height('100%')
+      }.width('100%')
+      .height('100%')
+    }.hideTitleBar(true)
+    .hideToolBar(true)
   }
 
   private requestQuestionsList() {
@@ -85,17 +90,20 @@ export struct QuestionsPage {
 
   @Builder
   ContentListView(scroller: Scroller) {
-    List({space:12}) {
+    List({ space: 12 }) {
       LazyForEach(this.questionsList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           QuestionsItemView({
             item: item
           })
             .onClick(() => {
-
+              this.questionsPathStack.pushPathByName('QuestionsDetailPage',
+                new Object({
+                  articleDetail: item
+                }),true);
             })
-        }.margin({left:12,right:12})
-      }, (item: CollectionsList) => item.id)
+        }.margin({ left: 12, right: 12 })
+      }, (item: CommonArticlesBean) => item.id)
     }.width('100%')
   }
 }

@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "QuestionsDetailPage",
+      "pageSourceFile": "src/main/ets/components/QuestionsDetailPage.ets",
+      "buildFunction": "QuestionsDetailPageBuilder"
+    }
+  ]
+}

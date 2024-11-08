@@ -82,6 +82,10 @@
     {
       "name": "mine",
       "srcPath": "./features/mine",
+    },
+    {
+      "name": "questions",
+      "srcPath": "./features/questions",
     }
   ]
 }

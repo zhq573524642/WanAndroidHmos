@@ -24,7 +24,7 @@ export enum TabBarType {
   HOME = 0,
   HMOS,
   SYSTEMS,
-  PROJECTS,
+  QUESTIONS,
   MINE
 }
 
@@ -48,10 +48,10 @@ export const TabsInfo: TabBarData[] = [
     defaultIcon: $r('app.media.ic_main_3_unselect')
   },
   {
-    id: TabBarType.PROJECTS,
-    title: $r('app.string.str_tab_project'),
-    activeIcon: $r('app.media.ic_main_4_select'),
-    defaultIcon: $r('app.media.ic_main_4_unselect')
+    id: TabBarType.QUESTIONS,
+    title: $r("app.string.str_tab_question"),
+    activeIcon: $r('app.media.ic_main_wenda_select'),
+    defaultIcon: $r('app.media.ic_main_wenda_unselect')
   },
   {
     id: TabBarType.MINE,

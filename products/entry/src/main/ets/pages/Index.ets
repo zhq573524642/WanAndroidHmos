@@ -6,6 +6,7 @@ import { HomePage } from 'home/src/main/ets/components/HomePage'
 import { HarmonyPage } from 'hmos/src/main/ets/components/HarmonyPage';
 import { SystemsPage } from 'systems';
 import { MinePage } from 'mine';
+import { QuestionsPage } from 'questions'
 
 @Entry
 @Component
@@ -15,6 +16,7 @@ struct Index {
   @Provide('appPathStack') appPathStack: NavPathStack = new NavPathStack();
   @Provide('homePathStack') homePathStack: NavPathStack = new NavPathStack()
   @Provide('minePathStack') minePathStack: NavPathStack = new NavPathStack()
+  @Provide('questionsPathStack') questionsPathStack: NavPathStack = new NavPathStack()
   @State currentIndex: TabBarType = TabBarType.HOME
 
   aboutToAppear(): void {
@@ -46,8 +48,8 @@ struct Index {
             }
 
             TabContent() {
+              QuestionsPage()
             }
-            .backgroundColor(Color.Blue)
 
             TabContent() {
               MinePage()
