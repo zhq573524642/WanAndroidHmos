@@ -1,0 +1,41 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "str_tab_home",
+      "value": "首页"
+    },
+    {
+      "name": "str_tab_hmos",
+      "value": "鸿蒙"
+    },
+    {
+      "name": "str_tab_systems",
+      "value": "体系"
+    },
+    {
+      "name": "str_tab_project",
+      "value": "导航"
+    },
+    {
+      "name": "str_tab_mine",
+      "value": "我的"
+    },
+    {
+      "name": "str_permission_internet",
+      "value": "请求网络数据"
+    }
+
+  ]
+}

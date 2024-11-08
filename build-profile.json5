@@ -1,0 +1,87 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\26496\\.ohos\\config\\default_WanAndroidHmos_sXoGXNuCaDZKAhufGnPMC1qtbhoZb7PIW9q7vD5Sl1E=.cer",
+          "storePassword": "0000001B40079C87FDE8D4D52CC9B7E59D6F84410F98C4196546EFFA4F303EEB7752A6DCC68638752FBF71",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BE2D56DC497D460318F7B55D35813CECE2B953477D9A2E6467BC50857831A8A953AEFECCADD3ABA",
+          "profile": "C:\\Users\\26496\\.ohos\\config\\default_WanAndroidHmos_sXoGXNuCaDZKAhufGnPMC1qtbhoZb7PIW9q7vD5Sl1E=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\26496\\.ohos\\config\\default_WanAndroidHmos_sXoGXNuCaDZKAhufGnPMC1qtbhoZb7PIW9q7vD5Sl1E=.p12"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./products/entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "utils",
+      "srcPath": "./commons/utils",
+    },
+    {
+      "name": "login",
+      "srcPath": "./features/login",
+    },
+    {
+      "name": "home",
+      "srcPath": "./features/home"
+    },
+    {
+      "name": "lib_components",
+      "srcPath": "./features/lib_components",
+    },
+    {
+      "name": "commons",
+      "srcPath": "./commons/commons",
+    },
+    {
+      "name": "hmos",
+      "srcPath": "./features/hmos",
+    },
+    {
+      "name": "systems",
+      "srcPath": "./features/systems",
+    },
+    {
+      "name": "mine",
+      "srcPath": "./features/mine",
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "lib_components",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}
