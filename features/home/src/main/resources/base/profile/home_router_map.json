@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "HomeSearchPage",
+      "pageSourceFile": "src/main/ets/components/HomeSearchPage.ets",
+      "buildFunction": "HomeSearchPageBuilder"
+    }
+  ]
+}
