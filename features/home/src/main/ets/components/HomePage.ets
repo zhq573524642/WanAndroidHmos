@@ -1,13 +1,13 @@
 import { LengthMetrics, router } from "@kit.ArkUI"
-import { PageTitleComponent } from "lib_components";
+import { CommonArticlesBean, CommonPagingBean, PageTitleComponent } from "lib_components";
 import mHomeViewModel from "../viewmodel/HomeViewModel";
 import { BannerData } from "../model/BannerData";
 import { ToastUtil } from "utils/src/main/ets/utils/ToastUtil";
 import { BasePage } from "commons";
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum";
-import HomeArticleListBean, { ArticlesData } from "../model/HomeArticleListBean";
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh";
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
+import { WebViewPage } from "lib_web/src/main/ets/components/WebViewPage";
 
 
 @Component
@@ -20,10 +20,10 @@ export struct HomePage {
   scroller: Scroller = new Scroller()
   @State pageIndex: number = 0
   @State isLoadAllOver: boolean = false
-  @State homeArticleList: LazyDataSource<ArticlesData> = new LazyDataSource()
-  @State tabLearnList: Array<ArticlesData> = []
-  @State tabQuestionList: Array<ArticlesData> = []
-  @State tabColumnList: Array<ArticlesData> = []
+  @State homeArticleList: LazyDataSource<CommonArticlesBean> = new LazyDataSource()
+  @State tabLearnList: Array<CommonArticlesBean> = []
+  @State tabQuestionList: Array<CommonArticlesBean> = []
+  @State tabColumnList: Array<CommonArticlesBean> = []
 
   aboutToAppear(): void {
     this.getHomeBannerData()
@@ -127,11 +127,14 @@ export struct HomePage {
   @Builder
   HomeArticleListView() {
     List({ space: 12 }) {
-      LazyForEach(this.homeArticleList, (item: ArticlesData, index: number) => {
+      LazyForEach(this.homeArticleList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           HomeArticleItem({
             item: item
           })
+            .onClick(() => {
+              WebViewPage.startPage(item.link, true, item.title)
+            })
         }.margin({ left: 20, right: 20 })
       })
     }.width('100%')
@@ -155,7 +158,7 @@ export struct HomePage {
   //获取首页列表
   private getHomeArticleList() {
     mHomeViewModel.getHomeArticleList(this.pageIndex)
-      .then((data: HomeArticleListBean) => {
+      .then((data: CommonPagingBean<CommonArticlesBean>) => {
         this.pageState = DefaultStateEnum.NORMAL
         this.refreshStatus = HeaderRefreshStatus.inactive
         this.loadMoreStatus = FooterLoadMoreStatus.inactive
@@ -176,15 +179,15 @@ export struct HomePage {
   //获取首页最受欢迎模块
   private getHomeWelComeTabData() {
     mHomeViewModel.getHomeWelcomeTabData(1)
-      .then((data: Array<ArticlesData>) => {
+      .then((data: Array<CommonArticlesBean>) => {
         this.tabLearnList = data
       })
     mHomeViewModel.getHomeWelcomeTabData(2)
-      .then((data: Array<ArticlesData>) => {
+      .then((data: Array<CommonArticlesBean>) => {
         this.tabQuestionList = data
       })
     mHomeViewModel.getHomeWelcomeTabData(3)
-      .then((data: Array<ArticlesData>) => {
+      .then((data: Array<CommonArticlesBean>) => {
         this.tabColumnList = data
       })
   }
@@ -202,6 +205,9 @@ export struct BannerView {
             .width('90%')
             .borderRadius(15)
             .objectFit(ImageFit.Contain)
+            .onClick(() => {
+              WebViewPage.startPage(item.url, true, item.title)
+            })
         }, (item: BannerData) => item.id + '')
       }
       .autoPlay(true)
@@ -219,6 +225,7 @@ export struct BannerView {
         .selectedItemHeight(10)
         .color(Color.Gray)
         .selectedColor($r('app.color.app_theme_color')))
+
     }.width('100%')
     .margin({ top: 10 })
     .alignItems(HorizontalAlign.Center)
@@ -228,7 +235,7 @@ export struct BannerView {
 
 @Component
 export struct HomeArticleItem {
-  item: ArticlesData = new ArticlesData()
+  item: CommonArticlesBean = new CommonArticlesBean()
 
   build() {
     Column() {
@@ -288,14 +295,14 @@ export struct HomeArticleItem {
 export struct WelcomeTabItem {
   type: number = 2 //由于接口肿分别用name和title两个字段，所以用type区分一下
   title: string = ''
-  @Prop list: Array<ArticlesData> = []
+  @Prop list: Array<CommonArticlesBean> = []
 
   build() {
     Column() {
       Text(this.title).fontSize(15).fontColor(Color.Black)
       Divider().width('100%').strokeWidth(1).color(Color.Black)
         .margin({ top: 3 })
-      ForEach(this.list, (item: ArticlesData, index: number) => {
+      ForEach(this.list, (item: CommonArticlesBean, index: number) => {
         Text('· ' + (this.type == 2 ? item.title : item.name))
           .fontSize(12)
           .fontColor(Color.Gray)
@@ -303,7 +310,7 @@ export struct WelcomeTabItem {
           .maxLines(2)
           .textAlign(TextAlign.Start)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-      }, (item: ArticlesData) => item.id + '')
+      }, (item: CommonArticlesBean) => item.id + '')
     }
     .layoutWeight(1)
     .borderRadius(5)

@@ -3,18 +3,20 @@ import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/D
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh";
 import mHMVewModel from "../viewmodel/HMViewModel";
 import { data } from "@kit.TelephonyKit";
-import HarmonyListBean, { ArticlesData } from "../model/HarmonyListBean";
+import HarmonyListBean from "../model/HarmonyListBean";
 import { LengthMetrics } from "@kit.ArkUI";
 import { ToastUtil } from "utils/src/main/ets/utils/ToastUtil";
+import { CommonArticlesBean } from "lib_components";
+import { WebViewPage } from "lib_web";
 
 @Component
 export struct HarmonyPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
-  @State linksList: Array<ArticlesData> = []
-  @State toolsList: Array<ArticlesData> = []
-  @State openSourcesList: Array<ArticlesData> = []
+  @State linksList: Array<CommonArticlesBean> = []
+  @State toolsList: Array<CommonArticlesBean> = []
+  @State openSourcesList: Array<CommonArticlesBean> = []
   @State linksTitle: string = ''
   @State toolsTitle: string = ''
   @State openSourcesTitle: string = ''
@@ -93,10 +95,15 @@ export struct HarmonyPage {
         .borderRadius(10)
         .margin({ top: 25 })
         .onSubmit((content: string) => {
-
+          if (content.length <= 0) {
+            ToastUtil.showToast('请输入搜索关键词')
+            return
+          }
+          let url = 'https://ohpm.openharmony.cn/#/cn/result?q=' + content
+          WebViewPage.startPage(url, true, '标题')
         })
 
-      Row({space:10}) {
+      Row({ space: 10 }) {
         ForEach(this.hotSearchArr, (item: string) => {
           Text(item)
             .fontSize(13)
@@ -112,7 +119,7 @@ export struct HarmonyPage {
             .borderColor(Color.White)
         }, (item: string) => item)
       }
-      .margin({top:15})
+      .margin({ top: 15 })
 
     }.width('100%')
     .height(200)
@@ -124,34 +131,44 @@ export struct HarmonyPage {
   ListView(scroller: Scroller) {
     List({ scroller: scroller }) {
       ListItemGroup({ header: this.HeaderBuilder(this.toolsTitle), space: 12 }) {
-        ForEach(this.toolsList, (item: ArticlesData, index: number) => {
+        ForEach(this.toolsList, (item: CommonArticlesBean, index: number) => {
           ListItem() {
             HMItemView({
               item: item
             })
+
           }
           .margin({ left: index % 2 == 0 ? 0 : 6, right: index % 2 == 0 ? 6 : 0 })
-        }, (item: ArticlesData) => item.id + '')
+          .onClick(() => {
+            WebViewPage.startPage(item.link, true, item.title)
+          })
+        }, (item: CommonArticlesBean) => item.id + '')
       }.margin({ left: 20, right: 20 })
 
       ListItemGroup({ header: this.HeaderBuilder(this.linksTitle), space: 12 }) {
-        ForEach(this.linksList, (item: ArticlesData, index: number) => {
+        ForEach(this.linksList, (item: CommonArticlesBean, index: number) => {
           ListItem() {
             HMItemView({
               item: item
             })
           }.margin({ left: index % 2 == 0 ? 0 : 6, right: index % 2 == 0 ? 6 : 0 })
-        }, (item: ArticlesData) => item.id + '')
+          .onClick(() => {
+            WebViewPage.startPage(item.link, true, item.title)
+          })
+        }, (item: CommonArticlesBean) => item.id + '')
       }.margin({ left: 20, right: 20 })
 
       ListItemGroup({ header: this.HeaderBuilder(this.openSourcesTitle), space: 12 }) {
-        ForEach(this.openSourcesList, (item: ArticlesData, index: number) => {
+        ForEach(this.openSourcesList, (item: CommonArticlesBean, index: number) => {
           ListItem() {
             HMItemView({
               item: item
             })
           }.margin({ left: index % 2 == 0 ? 0 : 6, right: index % 2 == 0 ? 6 : 0 })
-        }, (item: ArticlesData) => item.id + '')
+          .onClick(() => {
+            WebViewPage.startPage(item.link, true, item.title)
+          })
+        }, (item: CommonArticlesBean) => item.id + '')
       }.margin({ left: 20, right: 20 })
     }
     .width('100%')
@@ -177,7 +194,7 @@ export struct HarmonyPage {
 
 @Component
 export struct HMItemView {
-  item: ArticlesData = new ArticlesData()
+  item: CommonArticlesBean = new CommonArticlesBean()
 
   build() {
     Column({ space: 12 }) {

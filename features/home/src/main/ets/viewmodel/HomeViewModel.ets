@@ -2,8 +2,7 @@ import { BaseViewModel } from "commons";
 import { httpARequestGet, ResponseResultC } from 'utils';
 import { HomeApi } from '../api/HomeApi';
 import { BannerData } from '../model/BannerData';
-import HomeArticleListBean, { ArticlesData } from '../model/HomeArticleListBean';
-import { data } from '@kit.TelephonyKit';
+import { CommonArticlesBean, CommonPagingBean } from 'lib_components';
 
 class HomeViewModel extends BaseViewModel {
   //获取首页Banner
@@ -24,12 +23,12 @@ class HomeViewModel extends BaseViewModel {
   }
 
   //获取首页文章列表
-  getHomeArticleList(pageIndex: number): Promise<HomeArticleListBean> {
-    return new Promise<HomeArticleListBean>(async (resolve: Function, reject: Function) => {
-      httpARequestGet<ResponseResultC<HomeArticleListBean>>(
+  getHomeArticleList(pageIndex: number): Promise<CommonPagingBean<CommonArticlesBean>> {
+    return new Promise<CommonPagingBean<CommonArticlesBean>>(async (resolve: Function, reject: Function) => {
+      httpARequestGet<ResponseResultC<CommonPagingBean<CommonArticlesBean>>>(
         HomeApi.API_HOME_ARTICLE_LIST + '/' + pageIndex + '/json'
       )
-        .then((data: ResponseResultC<HomeArticleListBean>) => {
+        .then((data: ResponseResultC<CommonPagingBean<CommonArticlesBean>>) => {
           if (data.errorCode === 0) {
             resolve(data.data)
           } else {
@@ -43,8 +42,8 @@ class HomeViewModel extends BaseViewModel {
   }
 
   //获取首页最受欢迎模块 1 学习，2 问答，3 专栏
-  getHomeWelcomeTabData(type: number): Promise<Array<ArticlesData>> {
-    return new Promise<Array<ArticlesData>>(async (resolve, reject) => {
+  getHomeWelcomeTabData(type: number): Promise<Array<CommonArticlesBean>> {
+    return new Promise<Array<CommonArticlesBean>>(async (resolve, reject) => {
       let url: string = ''
       switch (type) {
         case 1:
@@ -57,10 +56,9 @@ class HomeViewModel extends BaseViewModel {
           url = HomeApi.API_WELCOME_COLUMN
           break
       }
-      httpARequestGet<ResponseResultC<Array<ArticlesData>>>(url)
-        .then((data: ResponseResultC<Array<ArticlesData>>) => {
+      httpARequestGet<ResponseResultC<Array<CommonArticlesBean>>>(url)
+        .then((data: ResponseResultC<Array<CommonArticlesBean>>) => {
           if (data.errorCode === 0) {
-            console.debug('===执行几次：'+type)
             resolve(data.data)
           } else {
             reject(data.errorMsg)
