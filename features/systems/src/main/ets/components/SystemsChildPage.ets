@@ -1,15 +1,15 @@
-import { PageTitleComponent } from 'lib_components'
+import { CommonArticlesBean, CommonPagingBean, PageTitleComponent } from 'lib_components'
 import { RouterUtil } from 'utils/src/main/ets/utils/RouterUtil'
 import { LengthMetrics, router } from '@kit.ArkUI'
 import { BasePage } from 'commons/src/main/ets/base/BasePage'
 import { DefaultStateEnum } from 'commons/src/main/ets/components/defaultState/DefaultStateEnum'
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from 'commons/src/main/ets/components/SVRefresh/SVRefresh'
-import SystemsArticleListBean, { ArticlesData } from '../model/SystemsArticleListBean'
 import mSystemsViewModel from '../viewmodel/SystemsViewModel'
 import { SystemChildrenList } from '../model/SystemsListBean'
 import LazyDataSource from 'utils/src/main/ets/utils/LazyDataSource'
 import { ToastUtil } from 'utils'
 import { SystemsSearchPage } from './SystemsSearchPage'
+import { WebViewPage } from 'lib_web'
 
 @Entry({ routeName: 'SystemsChildPage' })
 @Component
@@ -26,7 +26,7 @@ export struct SystemsChildPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
-  @State dataList: LazyDataSource<ArticlesData> = new LazyDataSource()
+  @State dataList: LazyDataSource<CommonArticlesBean> = new LazyDataSource()
   @State pageIndex: number = 0
   @State isAllLoadOver: boolean = false
 
@@ -46,7 +46,7 @@ export struct SystemsChildPage {
         isShowRightIcon: true,
         rightIcon: $r('app.media.ic_search'),
         onRightIconClick: () => {
-           SystemsSearchPage.startPage()
+          SystemsSearchPage.startPage()
         }
       })
       BasePage({
@@ -80,7 +80,7 @@ export struct SystemsChildPage {
 
   private getSystemsChildList() {
     mSystemsViewModel.getSystemsChildList(this.pageIndex, this.itemId)
-      .then((data: SystemsArticleListBean) => {
+      .then((data: CommonPagingBean<CommonArticlesBean>) => {
         if (data.total === 0) {
           this.pageState = DefaultStateEnum.EMPTY
         } else {
@@ -106,13 +106,16 @@ export struct SystemsChildPage {
   @Builder
   ListView(scroller: Scroller) {
     List({ scroller: scroller, space: 12 }) {
-      LazyForEach(this.dataList, (item: ArticlesData, index: number) => {
+      LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           SystemsChildItemView({
             item: item
           })
         }.margin({ left: 20, right: 20 })
-      }, (item: ArticlesData) => item.id + '')
+        .onClick(() => {
+          WebViewPage.startPage(item.link, true, item.title)
+        })
+      }, (item: CommonArticlesBean) => item.id + '')
     }.width('100%')
     .margin({ bottom: 20 })
     .layoutWeight(1)
@@ -122,7 +125,7 @@ export struct SystemsChildPage {
 
 @Component
 export struct SystemsChildItemView {
-  item: ArticlesData = new ArticlesData()
+  item: CommonArticlesBean = new CommonArticlesBean()
 
   build() {
     Column() {

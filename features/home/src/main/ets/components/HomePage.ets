@@ -8,6 +8,7 @@ import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/D
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh";
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
 import { WebViewPage } from "lib_web/src/main/ets/components/WebViewPage";
+import { HomeSearchPage } from "./HomeSearchPage";
 
 
 @Component
@@ -39,7 +40,7 @@ export struct HomePage {
           isShowRightIcon: true,
           rightIcon: $r('app.media.ic_search'),
           onRightIconClick: () => {
-
+            HomeSearchPage.startPage()
           }
         })
         BasePage({

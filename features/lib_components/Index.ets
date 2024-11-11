@@ -5,3 +5,7 @@ export { CommonTagsBean } from './src/main/ets/model/CommonTagsBean'
 export { CommonArticlesBean } from './src/main/ets/model/CommonArticlesBean'
 
 export { CommonPagingBean } from './src/main/ets/model/CommonPagingBean'
+
+export { FeatureUtils } from './src/main/ets/FeatureUtils'
+
+export { CommonArticleItem } from './src/main/ets/components/CommonArticleItem'

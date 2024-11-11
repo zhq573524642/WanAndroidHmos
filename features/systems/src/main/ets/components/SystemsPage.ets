@@ -6,6 +6,7 @@ import { SystemChildrenList, SystemsListBean } from '../model/SystemsListBean'
 import mSystemsViewModel from '../viewmodel/SystemsViewModel'
 import { LengthMetrics } from '@kit.ArkUI'
 import { SystemsChildPage } from './SystemsChildPage'
+import { FeatureUtils } from 'lib_components'
 
 @Component
 export struct SystemsPage {
@@ -110,7 +111,7 @@ export struct SystemsItemView {
   build() {
     Text(this.item.name)
       .fontSize(13)
-      .fontColor(Color.Black)
+      .fontColor(FeatureUtils.getRandomColor())
       .padding({
         left: 10,
         right: 10,
@@ -119,7 +120,7 @@ export struct SystemsItemView {
       })
       .borderWidth(1)
       .borderRadius(20)
-      .borderColor(Color.Black)
+      .borderColor(FeatureUtils.getRandomColor())
       .backgroundColor(Color.White)
   }
 }

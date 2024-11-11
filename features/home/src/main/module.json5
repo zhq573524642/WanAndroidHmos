@@ -2,6 +2,7 @@
   "module": {
     "name": "home",
     "type": "har",
+    "routerMap": '$profile:home_router_map',
     "deviceTypes": [
       "default",
       "tablet",

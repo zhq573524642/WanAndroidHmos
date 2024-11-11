@@ -49,6 +49,7 @@ export struct WebViewPage {
           Text(this.title)
             .fontColor(Color.Black)
             .fontSize(15)
+            .textAlign(TextAlign.Center)
             .alignRules({
               center: { anchor: '__container__', align: VerticalAlign.Center },
               middle: { anchor: '__container__', align: HorizontalAlign.Center }
@@ -65,34 +66,34 @@ export struct WebViewPage {
       }
 
       Web({ controller: this.controller, src: this.webUrl })
-        .onControllerAttached(() => {
-          //当Controller成功绑定到Web组件时触发该回调，
-          //且禁止在该事件回调前调用Web组件相关的接口，否则会抛出js-error异常
-        })
-        .onLoadIntercept((event: OnLoadInterceptEvent) => {
-          //当Web组件加载url之前触发该回调，用于判断是否阻止此次访问。默认允许加载
-          return false
-        })
-        .onOverrideUrlLoading((webResourceRequest: WebResourceRequest) => {
-          //当URL将要加载到当前Web中时，让宿主应用程序有机会获得控制权，
-          // 回调函数返回true将导致当前Web中止加载URL，而返回false则会导致Web继续照常加载URL
-          return false
-        })
-        .onInterceptRequest((event:OnInterceptRequestEvent) => {
-          return this.responseWeb
-        })
-        .onPageBegin((event:OnPageBeginEvent)=>{
-
-        })
-        .onPageEnd((event:OnPageEndEvent)=>{
-
-        })
-        .onPageVisible((event:OnPageVisibleEvent)=>{
-
-        })
-        .onRenderExited((event:OnRenderExitedEvent)=>{
-
-        })
+        // .onControllerAttached(() => {
+        //   //当Controller成功绑定到Web组件时触发该回调，
+        //   //且禁止在该事件回调前调用Web组件相关的接口，否则会抛出js-error异常
+        // })
+        // .onLoadIntercept((event: OnLoadInterceptEvent) => {
+        //   //当Web组件加载url之前触发该回调，用于判断是否阻止此次访问。默认允许加载
+        //   return false
+        // })
+        // .onOverrideUrlLoading((webResourceRequest: WebResourceRequest) => {
+        //   //当URL将要加载到当前Web中时，让宿主应用程序有机会获得控制权，
+        //   // 回调函数返回true将导致当前Web中止加载URL，而返回false则会导致Web继续照常加载URL
+        //   return false
+        // })
+        // .onInterceptRequest((event:OnInterceptRequestEvent) => {
+        //   return this.responseWeb
+        // })
+        // .onPageBegin((event:OnPageBeginEvent)=>{
+        //
+        // })
+        // .onPageEnd((event:OnPageEndEvent)=>{
+        //
+        // })
+        // .onPageVisible((event:OnPageVisibleEvent)=>{
+        //
+        // })
+        // .onRenderExited((event:OnRenderExitedEvent)=>{
+        //
+        // })
         // .onFirstContentfulPaint((event:OnFirstContentfulPaintEvent)=>{
         //    //网页首次内容绘制的回调函数
         // })

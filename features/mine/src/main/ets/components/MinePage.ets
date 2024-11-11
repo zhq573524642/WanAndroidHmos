@@ -1,5 +1,6 @@
 import { BreakpointTypeEnum, RouterUtil } from 'utils'
 import { CollectionsPage } from './CollectionsPage';
+import { NavigationPage } from './NavigationPage';
 import { OfficialAccountsPage } from './OfficialAccountsPage';
 
 import('login/src/main/ets/components/LoginPage');
@@ -90,7 +91,8 @@ export struct MinePage {
       .padding({ top: 12 })
 
       TabContent() {
-      }.tabBar(this.MineTabs(1, '问答'))
+        NavigationPage()
+      }.tabBar(this.MineTabs(1, '导航'))
       .backgroundColor($r('app.color.color_FAFAFA'))
       .padding({ top: 12 })
 

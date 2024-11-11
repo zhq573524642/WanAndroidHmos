@@ -4,6 +4,7 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/
 import { LengthMetrics } from "@kit.ArkUI"
 import { OfficialAccountBean } from "../model/OfficialAccountBean"
 import mAccountViewModel from "../viewmodel/AccountViewModel"
+import { FeatureUtils } from "lib_components"
 
 @Component
 export struct OfficialAccountsPage {
@@ -98,7 +99,7 @@ struct AccountView {
       .fontColor(Color.Black)
       .fontSize(14)
       .borderRadius(5)
-      .borderColor(Color.Black)
+      .borderColor(FeatureUtils.getRandomColor())
       .borderWidth(1)
       .backgroundColor(Color.White)
   }
