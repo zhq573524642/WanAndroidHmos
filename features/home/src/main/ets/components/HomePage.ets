@@ -37,9 +37,9 @@ export struct HomePage {
       Column() {
         PageTitleComponent({
           title: '首页',
-          isShowRightIcon: true,
-          rightIcon: $r('app.media.ic_search'),
-          onRightIconClick: () => {
+          isShowRightIcons: true,
+          rightIcons: [$r('app.media.ic_search')],
+          onRightIconClick: (icon:ResourceStr,index:number) => {
             HomeSearchPage.startPage()
           }
         })

@@ -23,10 +23,14 @@ export struct SystemsPage {
     Column() {
       PageTitleComponent({
         title: '体系',
-        isShowRightText: true,
-        rightText: '项目',
-        onRightTextClick: () => {
-
+        isShowRightTexts: true,
+        rightTexts: ['项目','教程'],
+        onRightTextClick: (title:ResourceStr,index:number) => {
+          if (index == 0) {
+            //项目
+          }else {
+            //教程
+          }
         }
       })
       BasePage({

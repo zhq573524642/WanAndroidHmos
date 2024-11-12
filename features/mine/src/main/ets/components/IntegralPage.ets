@@ -40,12 +40,12 @@ export struct IntegralPage {
       PageTitleComponent({
         title: '积分',
         isShowLeftIcon: true,
-        isShowRightText: true,
-        rightText: '记录',
+        isShowRightTexts: true,
+        rightTexts: ['记录'],
         onLeftIconClick: () => {
           router.back()
         },
-        onRightTextClick: () => {
+        onRightTextClick: (title: ResourceStr, index: number) => {
           IntegralRecordPage.startPage()
         }
       })

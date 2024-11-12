@@ -43,9 +43,9 @@ export struct SystemsChildPage {
     Column() {
       PageTitleComponent({
         title: this.title,
-        isShowRightIcon: true,
-        rightIcon: $r('app.media.ic_search'),
-        onRightIconClick: () => {
+        isShowRightIcons: true,
+        rightIcons: [$r('app.media.ic_search')],
+        onRightIconClick: (icon:ResourceStr,index:number) => {
           SystemsSearchPage.startPage()
         }
       })
