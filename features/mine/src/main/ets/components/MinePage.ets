@@ -43,7 +43,7 @@ export struct MinePage {
             }.width('100%')
           }
           .width('100%')
-          .height('100%')
+          .layoutWeight(1)
         }
         .width('100%')
         .layoutWeight(1)
@@ -103,7 +103,7 @@ export struct MinePage {
     Tabs({ index: this.currentTabIndex }) {
       TabContent() {
         CollectionsPage()
-      }.tabBar(this.MineTabs(0, '收藏'))
+      }.tabBar(this.MineTabs(0, '收藏文章'))
       .backgroundColor($r('app.color.color_FAFAFA'))
       .padding({ top: 12 })
 

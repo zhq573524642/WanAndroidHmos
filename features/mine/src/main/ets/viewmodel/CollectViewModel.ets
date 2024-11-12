@@ -1,5 +1,5 @@
 import { BaseViewModel } from 'commons';
-import { httpARequestGet, ResponseResultC } from 'utils';
+import { httpARequestGet, httpFormRequestPost, ResponseResultC } from 'utils';
 import { MineApi } from '../api/MineApi';
 import { CollectionsBean } from '../model/CollectionsBean';
 import { OfficialAccountBean } from '../model/OfficialAccountBean';
@@ -18,6 +18,28 @@ class CollectViewModel extends BaseViewModel {
           }
         })
         .catch((error: string) => {
+          reject(error)
+        })
+    })
+  }
+
+  handleCollect(id: string, originId: string): Promise<ResponseResultC<''>> {
+    this.showLoading()
+    return new Promise<ResponseResultC<''>>(async (resolve, reject) => {
+      let param: Record<string, Object> = {
+        "originId": originId !== '' ? originId : '-1'
+      }
+      httpFormRequestPost<ResponseResultC<''>>(MineApi.API_CANCEL_COLLECT_FOR_COLLECTION + id + '/json', param)
+        .then((data: ResponseResultC<''>) => {
+          this.hideLoading()
+          if (data.errorCode === 0) {
+            resolve(data)
+          } else {
+            reject(data.errorMsg)
+          }
+        })
+        .catch((error: string) => {
+          this.hideLoading()
           reject(error)
         })
     })

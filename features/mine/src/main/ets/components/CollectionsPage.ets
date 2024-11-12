@@ -5,8 +5,9 @@ import { CollectionsBean, CollectionsList } from "../model/CollectionsBean"
 import { LengthMetrics } from "@kit.ArkUI"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import mCollectViewModel from "../viewmodel/CollectViewModel"
-import { AppConstant, EmitterUtils, ToastUtil } from "utils"
+import { AppConstant, EmitterUtils, ResponseResultC, ToastUtil } from "utils"
 import { emitter } from "@kit.BasicServicesKit"
+import { data } from "@kit.TelephonyKit"
 
 @Component
 export struct CollectionsPage {
@@ -16,6 +17,7 @@ export struct CollectionsPage {
   @State collectionsList: LazyDataSource<CollectionsList> = new LazyDataSource()
   @State pageIndex: number = 0
   @State msgError: string = '数据异常'
+  @State msgNoData: string = '暂无收藏'
   @State isAllLoadOver: boolean = false
 
   aboutToAppear(): void {
@@ -37,6 +39,7 @@ export struct CollectionsPage {
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
         msgError: this.msgError,
+        msgNoData: this.msgNoData,
         ContentViewPage: (_scroller: Scroller) => {
           this.ContentListView(_scroller)
         },
@@ -91,32 +94,51 @@ export struct CollectionsPage {
 
   @Builder
   ContentListView(scroller: Scroller) {
-    List({ scroller: scroller }) {
+    List({ scroller: scroller, space: 12 }) {
       LazyForEach(this.collectionsList, (item: CollectionsList, index: number) => {
         ListItem() {
           CollectionItemView({
             item: item,
-            onCollectRemove: () => {
-
+            index: index,
+            onCollectRemove: (data: CollectionsList, i: number) => {
+              this.handleCancelCollect(item, index)
             }
           })
             .onClick(() => {
 
             })
         }
+        .padding({ left: 15, right: 15 })
       }, (item: CollectionsList) => item.id)
     }.width('100%')
+  }
+
+  private handleCancelCollect(item: CollectionsList, index: number) {
+    mCollectViewModel.handleCollect(item.id, item.originId)
+      .then((data: ResponseResultC<''>) => {
+        if (data.errorCode === 0) {
+          ToastUtil.showToast('已取消收藏')
+          this.collectionsList.deleteData(index)
+          if (this.collectionsList.isEmpty()) {
+            this.pageState = DefaultStateEnum.EMPTY
+          }
+        }
+      })
+      .catch((msg: string) => {
+        ToastUtil.showToast('取消收藏失败')
+      })
   }
 }
 
 @Component
 struct CollectionItemView {
   item: CollectionsList = new CollectionsList()
-  onCollectRemove?: () => void
+  index: number = 0
+  onCollectRemove?: (data: CollectionsList, index: number) => void
 
   build() {
     Row() {
-      Column() {
+      Column({ space: 10 }) {
         Row() {
           Text('分类：').fontColor(Color.Gray).fontSize(12)
           Text(this.item.chapterName).fontColor(Color.Grey).fontSize(12)
@@ -130,20 +152,27 @@ struct CollectionItemView {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .lineSpacing(LengthMetrics.vp(3))
         Row() {
-          Text('作者').fontColor(Color.Gray).fontSize(12)
+          Text('作者：').fontColor(Color.Gray).fontSize(12)
           Text(this.item.author).fontColor(Color.Grey).fontSize(12)
           Text('收藏时间：').fontColor(Color.Gray).fontSize(12).margin({ left: 8 })
           Text(this.item.niceDate).fontColor(Color.Grey).fontSize(12)
         }
       }.layoutWeight(1)
+      .margin({ right: 10 })
+      .alignItems(HorizontalAlign.Start)
+
 
       Image($r('app.media.ic_remove_collect'))
-        .width(28)
-        .height(28)
+        .width(18)
+        .height(18)
+        .objectFit(ImageFit.Fill)
         .onClick(() => {
-          this.onCollectRemove?.()
+          this.onCollectRemove?.(this.item, this.index)
         })
-    }.padding(15)
+    }
+    .padding(15)
+    .borderRadius(10)
+    .backgroundColor(Color.White)
     .width('100%')
     .alignItems(VerticalAlign.Center)
   }

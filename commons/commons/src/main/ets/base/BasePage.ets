@@ -20,6 +20,7 @@ export struct BasePage {
     Column() {
       this.ParentView()
     }.width('100%')
+    .layoutWeight(1)
   }
 
   @Builder

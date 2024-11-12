@@ -16,4 +16,5 @@ export class CollectionsList {
   chapterName: string = ''
   niceDate: string = ''
   id: string = ''
+  originId: string = ''
 }
