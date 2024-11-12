@@ -1,3 +1,4 @@
+@Observed
 export class IntegralBean {
   /**
    *  "coinCount": 159681,

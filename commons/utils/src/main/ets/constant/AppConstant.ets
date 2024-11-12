@@ -10,6 +10,7 @@ export class AppConstant {
   static readonly KEY_USERNAME: string = 'username'
   static readonly KEY_PASSWORD: string = 'password'
   static readonly KEY_NICKNAME: string = 'nickname'
+  static readonly KEY_USERINFO: string = 'userinfo'
   static readonly IS_LOGIN: string = 'is_login'
   //Emitter Flag
   static readonly FLAG_NO_LOGIN: number = -1001

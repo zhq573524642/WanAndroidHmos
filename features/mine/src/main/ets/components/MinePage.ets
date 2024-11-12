@@ -1,9 +1,12 @@
-import { AppConstant, BreakpointTypeEnum, EmitterUtils, RouterUtil } from 'utils'
+import { AppConstant, BreakpointTypeEnum, EmitterUtils, PreferenceManager, RouterUtil } from 'utils'
 import { CollectionsPage } from './CollectionsPage';
 import { IntegralPage } from './IntegralPage';
 import { NavigationPage } from './NavigationPage';
 import { OfficialAccountsPage } from './OfficialAccountsPage';
 import { emitter } from '@kit.BasicServicesKit';
+import mMineViewModel from '../viewmodel/MineViewModel';
+import { UserInfo, UserInfoBean } from '../model/UserInfoBean';
+import { IntegralBean } from '../model/IntegralBean';
 
 import('login/src/main/ets/components/LoginPage');
 
@@ -14,16 +17,36 @@ export struct MinePage {
   @State currentTabIndex: number = 0
   @State username: string = '---'
   outScroller: Scroller = new Scroller()
+  @State userInfo: UserInfo = new UserInfo()
+  @State userCoinInfo: IntegralBean = new IntegralBean()
 
   aboutToAppear(): void {
-    this.username=AppConstant.NICKNAME!==''?AppConstant.NICKNAME:(AppConstant.USERNAME!==''?AppConstant.USERNAME:'---')
+    this.username =
+      AppConstant.NICKNAME !== '' ? AppConstant.NICKNAME : (AppConstant.USERNAME !== '' ? AppConstant.USERNAME : '---')
     EmitterUtils.getInstance().on(AppConstant.FLAG_LOGIN_SUCCESS, (eventData: emitter.EventData) => {
-       this.username=AppConstant.NICKNAME!==''?AppConstant.NICKNAME:(AppConstant.USERNAME!==''?AppConstant.USERNAME:'---')
+      this.username = AppConstant.NICKNAME !== '' ? AppConstant.NICKNAME :
+        (AppConstant.USERNAME !== '' ? AppConstant.USERNAME : '---')
     })
+    this.getUserInfo()
   }
 
   aboutToDisappear(): void {
     EmitterUtils.getInstance().unregister(AppConstant.FLAG_LOGIN_SUCCESS)
+  }
+
+  private getUserInfo() {
+    mMineViewModel.getUserInfo()
+      .then((data: UserInfoBean) => {
+        this.userCoinInfo = data.coinInfo
+        PreferenceManager.getInstance().setValue<UserInfoBean>(AppConstant.KEY_USERINFO, data)
+        if (data.userInfo) {
+          this.userInfo = data.userInfo
+          AppConstant.NICKNAME = data.userInfo.nickname
+          AppConstant.USERNAME = data.userInfo.username
+          this.username = AppConstant.NICKNAME !== '' ? AppConstant.NICKNAME :
+            (AppConstant.USERNAME !== '' ? AppConstant.USERNAME : '---')
+        }
+      })
   }
 
   build() {
@@ -92,6 +115,12 @@ export struct MinePage {
         .fontColor(Color.White)
         .fontSize(15)
         .fontWeight(FontWeight.Bold)
+      Row() {
+        Text(`lv：${this.userCoinInfo.level}`).fontSize(13).fontColor('#00ff00')
+        Image($r('app.media.ic_integral_coin')).width(20).height(20)
+          .margin({ left: 15 })
+        Text(this.userCoinInfo.coinCount + '').fontColor('#f4ea2a').fontSize(13).margin({ left: 4 })
+      }
     }.alignItems(HorizontalAlign.Start)
     .width('100%')
     .padding({ left: 20, right: 20 })
@@ -132,7 +161,7 @@ export struct MinePage {
     })
     .barWidth(200)
     .barHeight(56)
-    .margin({ top: 65 })
+    .margin({ top: 35 })
     .onTabBarClick((index: number) => {
       this.currentTabIndex = index
     })

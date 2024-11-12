@@ -1,52 +1,39 @@
-import { BasePage } from "commons"
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum"
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh"
 import { CommonPagingBean, PageTitleComponent } from "lib_components"
-import { AppConstant, PreferenceManager, RouterUtil, ToastUtil } from "utils"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
-import { IntegralBean } from "../model/IntegralBean"
-import mIntegralViewModel from "../viewmodel/IntegralViewModel"
+import { IntegralRecordBean } from "../model/IntegralRecordBean"
 import { router } from "@kit.ArkUI"
-import { UserInfoBean } from "../model/UserInfoBean"
-import { IntegralRecordPage } from "./IntegralRecordPage"
+import { BasePage } from "commons"
+import { RouterNameUtils, RouterUtil, ToastUtil } from "utils"
+import mMineViewModel from "../viewmodel/MineViewModel"
+import mIntegralViewModel from "../viewmodel/IntegralViewModel"
 
-@Entry({ routeName: 'IntegralPage' })
+@Entry({ routeName: RouterNameUtils.PAGE_INTEGRAL_RECORD })
 @Component
-export struct IntegralPage {
+export struct IntegralRecordPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
-  @State dataList: LazyDataSource<IntegralBean> = new LazyDataSource()
+  @State dataList: LazyDataSource<IntegralRecordBean> = new LazyDataSource()
   @State pageIndex: number = 1
   @State isAllLoadOver: boolean = false
-  @State userCoinInfo: IntegralBean = new IntegralBean()
 
   static startPage() {
-    RouterUtil.pushNamedRoute('IntegralPage')
+    RouterUtil.pushNamedRoute(RouterNameUtils.PAGE_INTEGRAL_RECORD)
   }
 
   aboutToAppear(): void {
-    this.getIntegralRankList()
-    PreferenceManager.getInstance().getValue<UserInfoBean>(AppConstant.KEY_USERINFO)
-      .then((userInfo: UserInfoBean | null) => {
-        if (userInfo != null) {
-          this.userCoinInfo = userInfo.coinInfo
-        }
-      })
+    this.getIntegralRecordList()
   }
 
   build() {
     Column() {
       PageTitleComponent({
-        title: '积分',
+        title: '积分获取记录',
         isShowLeftIcon: true,
-        isShowRightText: true,
-        rightText: '记录',
         onLeftIconClick: () => {
           router.back()
-        },
-        onRightTextClick: () => {
-          IntegralRecordPage.startPage()
         }
       })
       BasePage({
@@ -58,7 +45,7 @@ export struct IntegralPage {
         },
         onRefreshing: () => {
           this.pageIndex = 1
-          this.getIntegralRankList()
+          this.getIntegralRecordList()
         },
         onLoadingMore: () => {
           if (this.isAllLoadOver) {
@@ -66,7 +53,7 @@ export struct IntegralPage {
             this.loadMoreStatus = FooterLoadMoreStatus.inactive
             return
           }
-          this.getIntegralRankList()
+          this.getIntegralRecordList()
         }
       })
         .layoutWeight(1)
@@ -77,9 +64,9 @@ export struct IntegralPage {
     .backgroundColor(Color.White)
   }
 
-  private getIntegralRankList() {
-    mIntegralViewModel.getIntegralRankList(this.pageIndex)
-      .then((data: CommonPagingBean<IntegralBean>) => {
+  private getIntegralRecordList() {
+    mIntegralViewModel.getIntegralRecordList(this.pageIndex)
+      .then((data: CommonPagingBean<IntegralRecordBean>) => {
         this.refreshStatus = HeaderRefreshStatus.inactive
         this.loadMoreStatus = FooterLoadMoreStatus.inactive
         this.isAllLoadOver = data.over
@@ -105,29 +92,14 @@ export struct IntegralPage {
   @Builder
   ContentView(scroller: Scroller) {
     Column() {
-      Row() {
-        Text('我的积分：').fontColor(Color.Black).fontSize(18).fontWeight(FontWeight.Bolder)
-        Text(`${this.userCoinInfo.coinCount}`).fontColor('#f4ea2a')
-          .fontSize(18).fontWeight(FontWeight.Bolder)
-        Blank().layoutWeight(1)
-        Text(`排名：${this.userCoinInfo.rank}`).fontColor(Color.Black).fontSize(18).fontWeight(FontWeight.Bolder)
-      }
-      .padding({
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: 20
-      })
-      .width('100%')
-
       List({ scroller: scroller }) {
-        LazyForEach(this.dataList, (item: IntegralBean) => {
+        LazyForEach(this.dataList, (item: IntegralRecordBean) => {
           ListItem() {
-            RankItemView({
+            IntegralRecordView({
               item: item
             })
           }
-        }, (item: IntegralBean) => item.userId)
+        }, (item: IntegralRecordBean) => item.id)
       }
       .divider({
         strokeWidth: 1,
@@ -140,30 +112,18 @@ export struct IntegralPage {
 }
 
 @Component
-struct RankItemView {
-  item: IntegralBean = new IntegralBean()
+struct IntegralRecordView {
+  item: IntegralRecordBean = new IntegralRecordBean()
 
   build() {
     Row() {
-      Text(this.item.rank + '')
-        .fontColor(Color.Black)
-        .fontSize(15)
-        .fontWeight(FontWeight.Bold)
-      Text(this.item.nickname !== '' ? this.item.nickname : this.item.username)
-        .fontColor(Color.Black)
-        .fontSize(15)
-        .margin({ left: 12 })
-      Text('lv:' + this.item.level).fontColor(Color.Green).fontSize(13).margin({ left: 8 })
-      Blank().layoutWeight(1)
-      Image($r('app.media.ic_integral_coin')).width(20).height(20)
-      Text(this.item.coinCount + '').fontColor('#f4ea2a').fontSize(13).margin({ left: 4 })
+      Text(this.item.desc).fontColor(Color.Black).fontSize(14)
     }.width('100%')
-    .alignItems(VerticalAlign.Center)
     .padding({
       left: 20,
       right: 20,
-      top: 15,
-      bottom: 15
+      top: 12,
+      bottom: 12
     })
   }
 }
