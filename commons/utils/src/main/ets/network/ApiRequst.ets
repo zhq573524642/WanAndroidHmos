@@ -18,17 +18,9 @@ export function setHeader(key: string, value: string) {
 //添加请求拦截器
 axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // 对请求数据做点什么
-  config.headers['token'] = AppConstant.TOKEN
-  PreferenceManager.getInstance().getValue<string[]>(AppConstant.COOKIE)
-    .then((value: string[] | null) => {
-      let cacheCookies = ['loginUserName=' + AppConstant.USERNAME, 'loginUserPassword=' + AppConstant.PASSWORD]
-      if (value !== null) {
-        value.forEach((cookie: string) => {
-          cacheCookies.push(cookie)
-        })
-      }
-      config.headers['cookie'] = cacheCookies
-    })
+  // config.headers['cookie'] =
+  //   'loginUserName_wanandroid_com=17610676602;token_pass_wanandroid_com=ac2f9497d54a8913f1be4deb985603f9;JSESSIONID=6B9245540D5059E5310E36174E9F5AE5'
+  // config.headers['cookie']=AppConstant.COOKIE_VALUE
   if (config.method == 'get' || config.method == 'GET') {
     Logger.debug(`===请求：${config.method}=${config.baseURL}${config.url}`, JSON.stringify(config.headers),
       JSON.stringify(config.params))
@@ -46,12 +38,16 @@ axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 // 添加响应拦截器
 axios.interceptors.response.use((response: AxiosResponse) => {
   Logger.debug('===响应=' + response.config.url, JSON.stringify(response.data))
-  // Logger.debug('===Header:' + JSON.stringify(response.headers))
   // 对响应数据做点什么
   if (response.config.url?.includes('user/login')) {
     let cookies: string[] | undefined = response.headers['set-cookie']
     if (cookies && cookies.length > 0) {
       PreferenceManager.getInstance().setValue(AppConstant.COOKIE, cookies)
+      let s = ''
+      cookies.forEach((cookie: string) => {
+        s += cookie + ';'
+      })
+      setHeader('cookie', s)
     }
   }
   return response;

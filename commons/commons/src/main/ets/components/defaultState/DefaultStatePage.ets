@@ -2,8 +2,6 @@ import { DefaultStateEnum } from './DefaultStateEnum';
 
 @Component
 export struct DefaultStatePage {
-  //控制空数据布局和异常布局时是否可以下拉刷新（前提是外部有下拉刷新组件）
-  @Prop isEnablePull: boolean = false
   //如果可以下拉刷新,则scroller要外部传入
   scroller?: Scroller = new Scroller()
   @BuilderParam normalPage: () => void;
@@ -15,42 +13,20 @@ export struct DefaultStatePage {
   onRetryCallback?: () => void
 
   build() {
-    if (this.isEnablePull) {
-      Scroll(this.scroller) {
-        Column() {
-          if (this.defaultState === DefaultStateEnum.LOADING) {
-            this.loading()
-          } else if (this.defaultState === DefaultStateEnum.EMPTY) {
-            this.empty()
-          } else if (this.defaultState === DefaultStateEnum.ERROR) {
-            this.error()
-          } else {
-            this.normalPage()
-          }
-        }
-        .width('100%')
-        .layoutWeight(1)
-
-      }.width('100%')
-      .height('100%')
-    } else {
-      Column() {
-        if (this.defaultState === DefaultStateEnum.LOADING) {
-          this.loading()
-        } else if (this.defaultState === DefaultStateEnum.EMPTY) {
-          this.empty()
-        } else if (this.defaultState === DefaultStateEnum.ERROR) {
-          this.error()
-        } else {
-          this.normalPage()
-        }
+    Column() {
+      if (this.defaultState === DefaultStateEnum.LOADING) {
+        this.loading()
+      } else if (this.defaultState === DefaultStateEnum.EMPTY) {
+        this.empty()
+      } else if (this.defaultState === DefaultStateEnum.ERROR) {
+        this.error()
+      } else {
+        this.normalPage()
       }
-      .width('100%')
-      .height('100%')
-
     }
-
-
+    .width('100%')
+    .height('100%')
+    .layoutWeight(1)
   }
 
   @Builder

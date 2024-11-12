@@ -1,11 +1,17 @@
 export class AppConstant {
   static TOKEN: string = ''
   static USERNAME: string = ''
+  static NICKNAME: string = ''
   static PASSWORD: string = ''
   static ID: string = ''
   static readonly USER_ID: string = 'user_id'
   static readonly COOKIE: string = 'cookie'
-  static readonly KEY_TOKEN: string = 'token'
+  static COOKIE_VALUE: string = ''
   static readonly KEY_USERNAME: string = 'username'
   static readonly KEY_PASSWORD: string = 'password'
+  static readonly KEY_NICKNAME: string = 'nickname'
+  static readonly IS_LOGIN: string = 'is_login'
+  //Emitter Flag
+  static readonly FLAG_NO_LOGIN: number = -1001
+  static readonly FLAG_LOGIN_SUCCESS: number = 100101
 }

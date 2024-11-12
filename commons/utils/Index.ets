@@ -21,3 +21,7 @@ export { RouterUtil } from './src/main/ets/utils/RouterUtil'
 export { AppConstant } from './src/main/ets/constant/AppConstant'
 
 export * from './src/main/ets/utils/PreferenceManager'
+
+export { EmitterUtils } from './src/main/ets/utils/EmitterUtils'
+
+export { RouterNameUtils } from './src/main/ets/constant/RouterNameUtils'

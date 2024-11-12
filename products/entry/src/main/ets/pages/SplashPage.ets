@@ -7,19 +7,12 @@ import('login/src/main/ets/components/LoginPage');
 @Entry
 @Component
 struct SplashPage {
-  @State message: string = 'Hello World';
+  @State message: string = '玩安卓-鸿蒙版';
 
   aboutToAppear(): void {
-    PreferenceManager.getInstance().getValue<string | null>(AppConstant.KEY_USERNAME)
-      .then((username: string | null) => {
-        if (username !== null) {
-          setTimeout(() => {
-            RouterUtil.replaceUrl('pages/Index')
-          }, 2000)
-        } else {
-          RouterUtil.replaceNamedRoute('LoginPage')
-        }
-      })
+    setTimeout(() => {
+      RouterUtil.replaceUrl('pages/Index')
+    }, 2000)
   }
 
   build() {

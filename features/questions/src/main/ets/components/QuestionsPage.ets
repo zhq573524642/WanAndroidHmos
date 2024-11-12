@@ -33,7 +33,6 @@ export struct QuestionsPage {
           refreshStatus: this.refreshStatus,
           loadMoreStatus: this.loadMoreStatus,
           msgError: this.msgError,
-          isEnableStatePagePull: true,
           ContentViewPage: (_scroller: Scroller) => {
             this.ContentListView(_scroller)
           },
@@ -90,7 +89,7 @@ export struct QuestionsPage {
 
   @Builder
   ContentListView(scroller: Scroller) {
-    List({ space: 12 }) {
+    List({ space: 12,scroller:scroller }) {
       LazyForEach(this.questionsList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           QuestionsItemView({

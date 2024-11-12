@@ -78,7 +78,7 @@ export struct HomePage {
 
   @Builder
   HomePageView(scroller: Scroller) {
-    List() {
+    List({scroller:scroller}) {
       ListItem() {
         //Banner
         BannerView({

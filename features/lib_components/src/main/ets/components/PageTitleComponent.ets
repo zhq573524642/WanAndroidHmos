@@ -4,9 +4,12 @@ export struct PageTitleComponent {
   titleFontSize?: ResourceStr | number = 30
   isShowLeftIcon?: boolean = false
   isShowRightIcon?: boolean = false
+  isShowRightText?: boolean = false
   rightIcon?: ResourceStr
+  rightText?: ResourceStr
   onLeftIconClick?: () => void
   onRightIconClick?: () => void
+  onRightTextClick?: () => void
 
   build() {
     Row() {
@@ -16,8 +19,8 @@ export struct PageTitleComponent {
           .height(30)
           .objectFit(ImageFit.Fill)
           .margin({ right: 10 })
-          .onClick(()=>{
-             this.onLeftIconClick?.()
+          .onClick(() => {
+            this.onLeftIconClick?.()
           })
       }
 
@@ -28,6 +31,14 @@ export struct PageTitleComponent {
         .fontWeight(FontWeight.Bold)
         .margin({ top: 15, bottom: 15 })
       Blank().layoutWeight(1)
+      if (this.isShowRightText) {
+        Text(this.rightText).fontColor(Color.Blue)
+          .fontSize(15)
+          .fontWeight(FontWeight.Bold)
+          .onClick(() => {
+            this.onRightTextClick?.()
+          })
+      }
       if (this.isShowRightIcon) {
         Image(this.rightIcon)
           .width(28)

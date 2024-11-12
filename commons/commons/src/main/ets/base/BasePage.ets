@@ -11,7 +11,6 @@ export struct BasePage {
   @Prop pageState?: DefaultStateEnum = DefaultStateEnum.LOADING
   @Prop msgNoData?: string = '暂无数据'
   @Prop msgError?: string = '数据异常，点击重试'
-  @Prop isEnableStatePagePull?: boolean = false
   onErrorRetryCallback?: () => void
   @BuilderParam ContentViewPage: (scroller: Scroller) => void
   onRefreshing?: () => void
@@ -49,7 +48,6 @@ export struct BasePage {
   @Builder
   ContentView(scroller: Scroller) {
     DefaultStatePage({
-      isEnablePull: this.isEnableStatePagePull,
       scroller: scroller,
       defaultState: this.pageState,
       noDataMsg: this.msgNoData,

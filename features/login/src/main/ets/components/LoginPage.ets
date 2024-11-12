@@ -1,5 +1,5 @@
 import { App, router } from '@kit.ArkUI';
-import { AppConstant, PreferenceManager, ToastUtil } from 'utils';
+import { AppConstant, EmitterUtils, PreferenceManager, RouterNameUtils, ToastUtil } from 'utils';
 import { LoginResultBean } from '../model/LoginResultBean';
 import { InputComponent } from '../view/InputComponent';
 import { TitleBarComponent } from '../view/TitleBarComponent';
@@ -7,7 +7,7 @@ import mLoginViewModel from '../viewmodel/LoginViewModel';
 
 const view_width_percent: string = '80%'
 
-@Entry({ routeName: 'LoginPage' })
+@Entry({ routeName: RouterNameUtils.PAGE_LOGIN })
 @Component
 export struct LoginPage {
   @State isLoginLayout: boolean = true
@@ -15,6 +15,18 @@ export struct LoginPage {
   @State inputAccount: string = ''
   @State inputPwd1: string = ''
   @State inputPwd2: string = ''
+
+  aboutToAppear(): void {
+    PreferenceManager.getInstance().getValue<string>(AppConstant.KEY_USERNAME)
+      .then((username: string | null) => {
+        if (username !== null && username.length > 0) {
+          this.isHaveAccount = true
+          this.inputAccount = username
+        } else {
+          this.isHaveAccount = false
+        }
+      })
+  }
 
   build() {
     Column() {
@@ -56,6 +68,21 @@ export struct LoginPage {
     this.isHaveAccount = isHaveAccount
   }
 
+  private requestLoginForHaveAccount() {
+    PreferenceManager.getInstance().getValue<string>(AppConstant.KEY_PASSWORD)
+      .then((value: string | null) => {
+        if (value !== null && value.length > 0) {
+          this.inputPwd1 = value
+          this.requestLogin()
+        } else {
+          ToastUtil.showToast('账号不存在，请重新登录')
+          this.isHaveAccount = false
+          this.inputAccount = ''
+          this.inputPwd1 = ''
+        }
+      })
+  }
+
   private requestLogin() {
     if (this.inputAccount.length <= 0) {
       ToastUtil.showToast('请输入账号')
@@ -73,14 +100,15 @@ export struct LoginPage {
       .then((data: LoginResultBean) => {
         if (data.id !== '') {
           ToastUtil.showToast('登录成功')
-          AppConstant.TOKEN = data.token
           AppConstant.USERNAME = data.username
-          AppConstant.PASSWORD = data.password
           AppConstant.ID = data.id
-          PreferenceManager.getInstance().setValue(AppConstant.KEY_USERNAME,data.username)
-          PreferenceManager.getInstance().setValue(AppConstant.KEY_PASSWORD,data.password)
+          PreferenceManager.getInstance().setValue(AppConstant.KEY_USERNAME, data.username)
+          PreferenceManager.getInstance().setValue(AppConstant.KEY_PASSWORD, data.password)
+          PreferenceManager.getInstance().setValue(AppConstant.KEY_NICKNAME, data.nickname)
+          PreferenceManager.getInstance().setValue(AppConstant.IS_LOGIN, true)
           PreferenceManager.getInstance().setValue(AppConstant.USER_ID, data.id)
             .then(() => {
+              EmitterUtils.getInstance().post(AppConstant.FLAG_LOGIN_SUCCESS)
               router.back()
             })
         }
@@ -159,13 +187,13 @@ export struct LoginPage {
   @Builder
   AccountView() {
     LoginAvatar({
-      title: '用户1232243444'
+      title: this.inputAccount
     })
     Column({ space: 25 }) {
       LoginButton({
         title: '以此账号登录',
         onButtonClick: () => {
-
+          this.requestLoginForHaveAccount()
         }
       })
       LoginButton({

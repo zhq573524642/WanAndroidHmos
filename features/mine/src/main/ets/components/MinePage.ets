@@ -1,7 +1,9 @@
-import { BreakpointTypeEnum, RouterUtil } from 'utils'
+import { AppConstant, BreakpointTypeEnum, EmitterUtils, RouterUtil } from 'utils'
 import { CollectionsPage } from './CollectionsPage';
+import { IntegralPage } from './IntegralPage';
 import { NavigationPage } from './NavigationPage';
 import { OfficialAccountsPage } from './OfficialAccountsPage';
+import { emitter } from '@kit.BasicServicesKit';
 
 import('login/src/main/ets/components/LoginPage');
 
@@ -10,7 +12,19 @@ export struct MinePage {
   @Consume('minePathStack') minePathStack: NavPathStack;
   @StorageProp('currentBreakpoint') currentBreakpoint: string = BreakpointTypeEnum.MD;
   @State currentTabIndex: number = 0
+  @State username: string = '---'
   outScroller: Scroller = new Scroller()
+
+  aboutToAppear(): void {
+    this.username=AppConstant.NICKNAME!==''?AppConstant.NICKNAME:(AppConstant.USERNAME!==''?AppConstant.USERNAME:'---')
+    EmitterUtils.getInstance().on(AppConstant.FLAG_LOGIN_SUCCESS, (eventData: emitter.EventData) => {
+       this.username=AppConstant.NICKNAME!==''?AppConstant.NICKNAME:(AppConstant.USERNAME!==''?AppConstant.USERNAME:'---')
+    })
+  }
+
+  aboutToDisappear(): void {
+    EmitterUtils.getInstance().unregister(AppConstant.FLAG_LOGIN_SUCCESS)
+  }
 
   build() {
 
@@ -49,6 +63,9 @@ export struct MinePage {
         .height(25)
         .objectFit(ImageFit.Cover)
         .margin({ right: 20 })
+        .onClick(() => {
+          IntegralPage.startPage()
+        })
       Image($r('app.media.ic_setting'))
         .width(25)
         .height(25)
@@ -71,7 +88,7 @@ export struct MinePage {
         .borderRadius(50)
         .borderWidth(2)
         .borderColor(Color.White)
-      Text('用户xxxxxxx')
+      Text(this.username)
         .fontColor(Color.White)
         .fontSize(15)
         .fontWeight(FontWeight.Bold)

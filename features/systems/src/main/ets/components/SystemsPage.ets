@@ -6,7 +6,7 @@ import { SystemChildrenList, SystemsListBean } from '../model/SystemsListBean'
 import mSystemsViewModel from '../viewmodel/SystemsViewModel'
 import { LengthMetrics } from '@kit.ArkUI'
 import { SystemsChildPage } from './SystemsChildPage'
-import { FeatureUtils } from 'lib_components'
+import { FeatureUtils, PageTitleComponent } from 'lib_components'
 
 @Component
 export struct SystemsPage {
@@ -21,6 +21,14 @@ export struct SystemsPage {
 
   build() {
     Column() {
+      PageTitleComponent({
+        title: '体系',
+        isShowRightText: true,
+        rightText: '项目',
+        onRightTextClick: () => {
+
+        }
+      })
       BasePage({
         pageState: this.pageState,
         refreshStatus: this.refreshStatus,
@@ -28,10 +36,11 @@ export struct SystemsPage {
         ContentViewPage: (_scroller: Scroller) => {
           this.ListView(_scroller)
         },
-        onRefreshing:()=>{
-           this.getSystemsListData()
+        onRefreshing: () => {
+          this.getSystemsListData()
         }
       })
+        .layoutWeight(1)
 
     }.width('100%')
     .justifyContent(FlexAlign.Start)
@@ -42,7 +51,7 @@ export struct SystemsPage {
   private getSystemsListData() {
     mSystemsViewModel.getSystemsList()
       .then((data: Array<SystemsListBean>) => {
-        this.refreshStatus=HeaderRefreshStatus.inactive
+        this.refreshStatus = HeaderRefreshStatus.inactive
         if (data.length > 0) {
           this.pageState = DefaultStateEnum.NORMAL
           this.systemsList = data
@@ -51,7 +60,7 @@ export struct SystemsPage {
         }
       })
       .catch((msg: string) => {
-        this.refreshStatus=HeaderRefreshStatus.inactive
+        this.refreshStatus = HeaderRefreshStatus.inactive
         this.pageState = DefaultStateEnum.ERROR
         ToastUtil.showToast(msg)
       })
@@ -88,6 +97,7 @@ export struct SystemsPage {
       }
       .padding({ left: 20, right: 20 })
     }.width('100%')
+    .layoutWeight(1)
 
   }
 

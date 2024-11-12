@@ -5,7 +5,8 @@ import { CollectionsBean, CollectionsList } from "../model/CollectionsBean"
 import { LengthMetrics } from "@kit.ArkUI"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import mCollectViewModel from "../viewmodel/CollectViewModel"
-import { ToastUtil } from "utils"
+import { AppConstant, EmitterUtils, ToastUtil } from "utils"
+import { emitter } from "@kit.BasicServicesKit"
 
 @Component
 export struct CollectionsPage {
@@ -18,7 +19,14 @@ export struct CollectionsPage {
   @State isAllLoadOver: boolean = false
 
   aboutToAppear(): void {
+    EmitterUtils.getInstance().on(AppConstant.FLAG_LOGIN_SUCCESS, (eventData: emitter.EventData) => {
+      this.requestCollectionsList()
+    })
     this.requestCollectionsList()
+  }
+
+  aboutToDisappear(): void {
+    EmitterUtils.getInstance().unregister(AppConstant.FLAG_LOGIN_SUCCESS)
   }
 
   build() {
@@ -29,7 +37,6 @@ export struct CollectionsPage {
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
         msgError: this.msgError,
-        isEnableStatePagePull:true,
         ContentViewPage: (_scroller: Scroller) => {
           this.ContentListView(_scroller)
         },

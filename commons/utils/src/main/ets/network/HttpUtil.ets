@@ -13,6 +13,7 @@ import axios from './ApiRequst'
 import fs from '@ohos.file.fs';
 import HashMap from '@ohos.util.HashMap';
 import Logger from '../utils/Logger';
+import { AppConstant, EmitterUtils } from '../../../../Index';
 
 const cancelTokenStatic: CancelTokenStatic = axios.CancelToken
 const requestMap: HashMap<string, object> = new HashMap();
@@ -33,9 +34,9 @@ export function http<T, D>(option: AxiosRequestConfig<D>): Promise<T> {
   return new Promise((resolve: Function, reject: Function) => {
     const successHandler = (res: AxiosResponse<T>) => {
       if (res.status === 200) {
-        if (res.data['code'] == 401) {
-          // EventBus.getInstance().post(401)
-          reject(res.data['info']);
+        if (res.data['errorCode'] == AppConstant.FLAG_NO_LOGIN) {
+          EmitterUtils.getInstance().post(AppConstant.FLAG_NO_LOGIN)
+          reject(res.data['errorMsg']);
         } else {
           resolve(res.data)
         }
@@ -44,11 +45,7 @@ export function http<T, D>(option: AxiosRequestConfig<D>): Promise<T> {
       }
     }
     const failHandler = (error: AxiosError) => {
-      if (error.response && error.response?.status === 401) {
-        // EventBus.getInstance().post(401)
-      } else {
-        reject(error.message);
-      }
+      reject(error.message);
       console.info(JSON.stringify(error));
     }
 
