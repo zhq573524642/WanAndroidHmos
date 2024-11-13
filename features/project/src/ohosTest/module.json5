@@ -1,6 +1,6 @@
 {
   "module": {
-    "name": "systems_test",
+    "name": "project_test",
     "type": "feature",
     "deviceTypes": [
       "default",

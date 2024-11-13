@@ -1,14 +1,14 @@
 import { BaseViewModel } from 'commons/src/main/ets/base/BaseViewModel';
 import { SystemChildrenList, SystemsListBean } from '../model/SystemsListBean';
 import { httpARequestGet, ResponseResultC } from 'utils';
-import { SystemsApi } from '../api/SystemsApi';
+import { ProjectsApi } from '../api/ProjectsApi';
 import { CommonArticlesBean, CommonPagingBean } from 'lib_components';
 
 
 class SystemsViewModel extends BaseViewModel {
   getSystemsList(): Promise<Array<SystemsListBean>> {
     return new Promise<Array<SystemsListBean>>(async (resolve, reject) => {
-      httpARequestGet<ResponseResultC<Array<SystemsListBean>>>(SystemsApi.API_SYSTEMS_LIST)
+      httpARequestGet<ResponseResultC<Array<SystemsListBean>>>(ProjectsApi.API_SYSTEMS_LIST)
         .then((data: ResponseResultC<Array<SystemsListBean>>) => {
           if (data.errorCode === 0) {
             resolve(data.data)

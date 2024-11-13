@@ -4,16 +4,22 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from 'commons/src/main/ets/
 import { ToastUtil } from 'utils/src/main/ets/utils/ToastUtil'
 import { SystemChildrenList, SystemsListBean } from '../model/SystemsListBean'
 import mSystemsViewModel from '../viewmodel/SystemsViewModel'
-import { LengthMetrics } from '@kit.ArkUI'
+import { LengthMetrics, router } from '@kit.ArkUI'
 import { SystemsChildPage } from './SystemsChildPage'
 import { FeatureUtils, PageTitleComponent } from 'lib_components'
+import { RouterUtil } from 'utils'
 
+@Entry({routeName:'SystemsPage'})
 @Component
 export struct SystemsPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
   @State systemsList: Array<SystemsListBean> = []
+
+  static startPage(){
+    RouterUtil.pushNamedRoute('SystemsPage')
+  }
 
   aboutToAppear(): void {
     this.getSystemsListData()
@@ -23,14 +29,9 @@ export struct SystemsPage {
     Column() {
       PageTitleComponent({
         title: '体系',
-        isShowRightTexts: true,
-        rightTexts: ['项目','教程'],
-        onRightTextClick: (title:ResourceStr,index:number) => {
-          if (index == 0) {
-            //项目
-          }else {
-            //教程
-          }
+        isShowLeftIcon: true,
+        onLeftIconClick: () => {
+          router.back()
         }
       })
       BasePage({

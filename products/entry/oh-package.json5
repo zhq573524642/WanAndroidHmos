@@ -9,7 +9,7 @@
     "utils": "file:../../commons/utils",
     "home": "file:../../features/home",
     "hmos": "file:../../features/hmos",
-    "systems": "file:../../features/systems",
+    "project": "file:../../features/project",
     "questions": "file:../../features/questions",
     "mine": "file:../../features/mine",
     "login": "file:../../features/login"

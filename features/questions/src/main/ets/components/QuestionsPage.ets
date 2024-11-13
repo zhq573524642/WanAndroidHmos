@@ -6,6 +6,7 @@ import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import { ToastUtil } from "utils"
 import { CommonArticlesBean, CommonPagingBean, CommonTagsBean, PageTitleComponent } from "lib_components"
 import mQuestionsViewModel from "../viewmodel/QuestionsViewModel"
+import { PlazaDataPage } from "./PlazaDataPage"
 
 @Component
 export struct QuestionsPage {
@@ -27,6 +28,11 @@ export struct QuestionsPage {
       Column() {
         PageTitleComponent({
           title: '问答',
+          isShowRightTexts: true,
+          rightTexts: ['广场'],
+          onRightTextClick: (title: ResourceStr, index: number) => {
+            PlazaDataPage.startPage()
+          }
         })
         BasePage({
           pageState: this.pageState,
@@ -89,7 +95,7 @@ export struct QuestionsPage {
 
   @Builder
   ContentListView(scroller: Scroller) {
-    List({ space: 12,scroller:scroller }) {
+    List({ space: 12, scroller: scroller }) {
       LazyForEach(this.questionsList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           QuestionsItemView({
@@ -99,7 +105,7 @@ export struct QuestionsPage {
               this.questionsPathStack.pushPathByName('QuestionsDetailPage',
                 new Object({
                   articleDetail: item
-                }),true);
+                }), true);
             })
         }.margin({ left: 12, right: 12 })
       }, (item: CommonArticlesBean) => item.id)

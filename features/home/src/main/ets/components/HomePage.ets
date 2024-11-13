@@ -246,8 +246,8 @@ export struct HomeArticleItem {
             .fontColor(Color.Red)
             .fontSize(11)
             .padding({
-              left: 6,
-              right: 6,
+              left: 5,
+              right: 5,
               top: 4,
               bottom: 4
             })

@@ -25,6 +25,10 @@
       "value": "体系"
     },
     {
+      "name": "str_tab_projects",
+      "value": "项目"
+    },
+    {
       "name": "str_tab_question",
       "value": "问答"
     },

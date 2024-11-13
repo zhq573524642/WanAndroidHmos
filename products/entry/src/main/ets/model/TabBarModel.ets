@@ -23,7 +23,7 @@ export interface TabBarData {
 export enum TabBarType {
   HOME = 0,
   HMOS,
-  SYSTEMS,
+  PROJECTS,
   QUESTIONS,
   MINE
 }
@@ -42,10 +42,10 @@ export const TabsInfo: TabBarData[] = [
     defaultIcon: $r('app.media.ic_hm_unselect')
   },
   {
-    id: TabBarType.SYSTEMS,
-    title: $r('app.string.str_tab_systems'),
-    activeIcon: $r('app.media.ic_main_3_select'),
-    defaultIcon: $r('app.media.ic_main_3_unselect')
+    id: TabBarType.PROJECTS,
+    title: $r('app.string.str_tab_projects'),
+    activeIcon: $r('app.media.ic_main_project_select'),
+    defaultIcon: $r('app.media.ic_main_project_unselect')
   },
   {
     id: TabBarType.QUESTIONS,

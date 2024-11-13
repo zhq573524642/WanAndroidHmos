@@ -5,5 +5,9 @@
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
-  "dependencies": {}
+  "dependencies": {
+    //common工具
+    "utils": "file:../../commons/utils",
+    "commons": "file:../../commons/commons"
+  }
 }

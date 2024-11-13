@@ -1,6 +1,6 @@
 {
   "module": {
-    "name": "systems",
+    "name": "project",
     "type": "har",
     "deviceTypes": [
       "default",

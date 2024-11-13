@@ -1,13 +1,13 @@
 import { CommonTagsBean } from "./CommonTagsBean"
 
-@Observed
-export class CommonArticlesBean {
+@ObservedV2
+export class CommonArticlesBeanV2 {
   author: string = ''
   shareUser: string = ''
-  superChapterName:string=''
+  superChapterName: string = ''
   chapterName: string = ''
   link: string = ''
-  collect: boolean = false
+  @Trace collect: boolean = false
   id: string = ''
   title: string = ''
   name: string = ''
@@ -17,6 +17,6 @@ export class CommonArticlesBean {
   zan: number = 0
   fresh: boolean = false
   tags: Array<CommonTagsBean> = []
-  envelopePic:string=''
-  projectLink:string=''
+  envelopePic: string = ''
+  projectLink: string = ''
 }

@@ -76,8 +76,8 @@
       "srcPath": "./features/hmos",
     },
     {
-      "name": "systems",
-      "srcPath": "./features/systems",
+      "name": "project",
+      "srcPath": "./features/project"
     },
     {
       "name": "mine",

@@ -4,12 +4,12 @@ import { AppConstants } from '../constants/AppConstants';
 import { TabBarType } from '../model/TabBarModel';
 import { HomePage } from 'home/src/main/ets/components/HomePage'
 import { HarmonyPage } from 'hmos/src/main/ets/components/HarmonyPage';
-import { SystemsPage } from 'systems';
 import { MinePage } from 'mine';
 import { QuestionsPage } from 'questions'
 import { AppConstant, EmitterUtils, PreferenceManager, RouterNameUtils, RouterUtil, setHeader, ToastUtil } from 'utils';
 import { emitter } from '@kit.BasicServicesKit';
 import { LoginPage } from 'login';
+import { HotProjectPage } from 'project/src/main/ets/components/HotProjectPage';
 
 @Entry
 @Component
@@ -75,7 +75,7 @@ struct Index {
         }) {
           Tabs({ index: this.currentIndex }) {
             TabContent() {
-              HomePage()
+              // HomePage()
             }
 
             TabContent() {
@@ -84,7 +84,7 @@ struct Index {
 
 
             TabContent() {
-              SystemsPage()
+              HotProjectPage()
             }
 
             TabContent() {
