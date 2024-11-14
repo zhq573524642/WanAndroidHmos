@@ -6,7 +6,7 @@ import { ObservedArray, ResponseResultC, RouterUtil, ToastUtil } from "utils"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import { LengthMetrics, router } from "@kit.ArkUI"
 import mProjectsViewModel from "../viewmodel/ProjectsViewModel"
-import { WebViewPage } from "lib_web"
+import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 
 @Component
 export struct HotProjectListPage {
@@ -112,35 +112,37 @@ export struct HotProjectListPage {
   ContentListView(scroller: Scroller) {
     List({ scroller: scroller }) {
       LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
-        ProjectItemView({
-          item: item,
-          onCollectClick: () => {
-            if (!item.collect) {
-              this.itemDataBean = item
-              this.handleCollectArticle(item, index)
+        ListItem(){
+          ProjectItemView({
+            item: item,
+            onCollectClick: () => {
+              if (!item.collect) {
+                this.itemDataBean = item
+                this.handleCollectArticle(item, index)
+              }
             }
-          }
-        })
-          .margin({
-            left: 15,
-            right: 15,
-            top: index == 0 ? 16 : 8,
-            bottom: 8
           })
-          .bindMenu([
-            {
-              value: '详情',
-              action: () => {
-                WebViewPage.startPage(item.link, true, item.title)
+            .margin({
+              left: 15,
+              right: 15,
+              top: index == 0 ? 16 : 8,
+              bottom: 8
+            })
+            .bindMenu([
+              {
+                value: '站内网页',
+                action: () => {
+                  WebViewPage.startPage(item.link, true, item.title)
+                }
+              },
+              {
+                value: '站外网页',
+                action: () => {
+                  WebViewPage.startPage(item.projectLink, true, item.title)
+                }
               }
-            },
-            {
-              value: '源数据详情',
-              action: () => {
-                WebViewPage.startPage(item.projectLink, true, item.title)
-              }
-            }
-          ])
+            ])
+        }
       }, (item: CommonArticlesBean) => item.id)
     }.width('100%')
     .layoutWeight(1)

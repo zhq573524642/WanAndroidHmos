@@ -1,5 +1,12 @@
 import { LengthMetrics, router } from "@kit.ArkUI"
-import { CommonArticlesBean, CommonPagingBean, PageTitleComponent } from "lib_components";
+import {
+  ArticleFromType,
+  CommonArticleItem,
+  CommonArticlesBean,
+  CommonPagingBean,
+  CommonShareArticlePage,
+  PageTitleComponent
+} from "lib_components";
 import mHomeViewModel from "../viewmodel/HomeViewModel";
 import { BannerData } from "../model/BannerData";
 import { ToastUtil } from "utils/src/main/ets/utils/ToastUtil";
@@ -7,7 +14,7 @@ import { BasePage } from "commons";
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum";
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh";
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
-import { WebViewPage } from "lib_web/src/main/ets/components/WebViewPage";
+import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
 import { HomeSearchPage } from "./HomeSearchPage";
 
 
@@ -39,7 +46,7 @@ export struct HomePage {
           title: '首页',
           isShowRightIcons: true,
           rightIcons: [$r('app.media.ic_search')],
-          onRightIconClick: (icon:ResourceStr,index:number) => {
+          onRightIconClick: (icon: ResourceStr, index: number) => {
             HomeSearchPage.startPage()
           }
         })
@@ -78,7 +85,7 @@ export struct HomePage {
 
   @Builder
   HomePageView(scroller: Scroller) {
-    List({scroller:scroller}) {
+    List({ scroller: scroller }) {
       ListItem() {
         //Banner
         BannerView({
@@ -130,8 +137,16 @@ export struct HomePage {
     List({ space: 12 }) {
       LazyForEach(this.homeArticleList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
-          HomeArticleItem({
-            item: item
+          CommonArticleItem({
+            item: item,
+            onArticleAuthorClick: (isAuthor: boolean) => {
+                if (isAuthor) {
+                  CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author)
+                } else {
+                  CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId,
+                    '分享人:' + item.shareUser)
+                }
+            }
           })
             .onClick(() => {
               WebViewPage.startPage(item.link, true, item.title)
@@ -234,63 +249,6 @@ export struct BannerView {
   }
 }
 
-@Component
-export struct HomeArticleItem {
-  item: CommonArticlesBean = new CommonArticlesBean()
-
-  build() {
-    Column() {
-      Row() {
-        if (this.item.fresh) {
-          Text('新')
-            .fontColor(Color.Red)
-            .fontSize(11)
-            .padding({
-              left: 5,
-              right: 5,
-              top: 4,
-              bottom: 4
-            })
-            .borderRadius(3)
-            .borderColor(Color.Red)
-            .borderWidth(1)
-            .margin({ right: 6 })
-        }
-        Text(`${this.item.superChapterName}/${this.item.chapterName}`)
-          .fontColor(Color.Blue).fontSize(13)
-
-
-        Blank().layoutWeight(1)
-        Text(this.item.niceDate).fontColor(Color.Gray).fontSize(12)
-      }.alignItems(VerticalAlign.Center)
-
-      Text(this.item.title)
-        .fontColor(Color.Black)
-        .fontSize(15)
-        .width('100%')
-        .maxLines(2)
-        .lineSpacing(LengthMetrics.vp(2))
-        .textAlign(TextAlign.Start)
-        .ellipsisMode(EllipsisMode.END)
-        .margin({ top: 10, bottom: 10 })
-      Row() {
-        Text(this.item.shareUser !== '' ? '分享者：' + this.item.shareUser : '作者：' + this.item.author)
-          .fontColor(Color.Grey).fontSize(13)
-        Blank().layoutWeight(1)
-        Image(this.item.collect ? $r('app.media.ic_collect_select') : $r('app.media.ic_collect_unselect'))
-          .objectFit(ImageFit.Cover)
-          .width(25)
-          .height(25)
-      }.alignItems(VerticalAlign.Center)
-
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start)
-    .borderRadius(10)
-    .backgroundColor(Color.White)
-    .padding(15)
-  }
-}
 
 @Component
 export struct WelcomeTabItem {

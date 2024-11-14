@@ -4,11 +4,12 @@ export { CommonTagsBean } from './src/main/ets/model/CommonTagsBean'
 
 export { CommonArticlesBean } from './src/main/ets/model/CommonArticlesBean'
 
-export { CommonArticlesBeanV2 } from './src/main/ets/model/CommonArticlesBeanV2'
-
 export { CommonPagingBean } from './src/main/ets/model/CommonPagingBean'
 
 export { FeatureUtils } from './src/main/ets/FeatureUtils'
 
 export { CommonArticleItem } from './src/main/ets/components/CommonArticleItem'
+
+export * from './src/main/ets/components/CommonShareArticlePage'
+
 

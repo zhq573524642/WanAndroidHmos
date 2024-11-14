@@ -13,7 +13,6 @@
     "lib_components": "file:../lib_components",
     //登录模块
     "login": "file:../login",
-    "questions": "file:../questions",
-    "lib_web": "file:../lib_web"
+    "questions": "file:../questions"
   }
 }

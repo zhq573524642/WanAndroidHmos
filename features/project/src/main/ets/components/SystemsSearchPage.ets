@@ -6,8 +6,8 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
 import { CommonArticlesBean, CommonPagingBean } from "lib_components";
 import mSystemsViewModel from "../viewmodel/SystemsViewModel";
-import { WebViewPage } from "lib_web";
 import { SystemsChildItemView } from "./SystemsChildPage";
+import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
 
 @Entry({ routeName: 'SystemsSearchPage' })
 @Component

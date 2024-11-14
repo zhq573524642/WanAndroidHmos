@@ -86,10 +86,6 @@
     {
       "name": "questions",
       "srcPath": "./features/questions",
-    },
-    {
-      "name": "lib_web",
-      "srcPath": "./features/lib_web",
     }
   ]
 }

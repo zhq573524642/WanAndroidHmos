@@ -4,7 +4,7 @@ import { CommonTagsBean } from "./CommonTagsBean"
 export class CommonArticlesBean {
   author: string = ''
   shareUser: string = ''
-  superChapterName:string=''
+  superChapterName: string = ''
   chapterName: string = ''
   link: string = ''
   collect: boolean = false
@@ -17,6 +17,7 @@ export class CommonArticlesBean {
   zan: number = 0
   fresh: boolean = false
   tags: Array<CommonTagsBean> = []
-  envelopePic:string=''
-  projectLink:string=''
+  envelopePic: string = ''
+  projectLink: string = ''
+  userId: number = 0
 }

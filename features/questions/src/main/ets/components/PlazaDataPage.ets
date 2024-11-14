@@ -1,12 +1,20 @@
 import { BasePage } from "commons/src/main/ets/base/BasePage"
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum"
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh"
-import { CommonArticleItem, CommonArticlesBean, CommonPagingBean, PageTitleComponent } from "lib_components"
+import {
+  ArticleFromType,
+  CommonArticleItem,
+  CommonArticlesBean,
+  CommonPagingBean,
+  CommonShareArticlePage,
+  PageTitleComponent
+} from "lib_components"
 import { RouterUtil } from "utils"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import { ToastUtil } from "utils/src/main/ets/utils/ToastUtil"
 import mPlazaViewModel from "../viewmodel/PlazaViewModel"
 import { router } from "@kit.ArkUI"
+import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 
 @Entry({ routeName: 'PlazaDataPage' })
 @Component
@@ -33,7 +41,7 @@ export struct PlazaDataPage {
       PageTitleComponent({
         title: '广场',
         isShowLeftIcon: true,
-        onLeftIconClick:()=>{
+        onLeftIconClick: () => {
           router.back()
         }
       })
@@ -70,15 +78,27 @@ export struct PlazaDataPage {
   ContentListView(scroller: Scroller) {
     List({ scroller: scroller }) {
       LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
-        CommonArticleItem({
-          item: item
-        })
-          .margin({
-            left: 15,
-            right: 15,
-            top: index == 0 ? 16 : 8,
-            bottom: 8
+        ListItem(){
+          CommonArticleItem({
+            item: item,
+            onArticleAuthorClick: (isAuthor: boolean) => {
+              if (isAuthor) {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author)
+              } else {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId, '分享人:' + item.shareUser)
+              }
+            }
           })
+            .onClick(()=>{
+               WebViewPage.startPage(item.link,true,item.title)
+            })
+            .margin({
+              left: 15,
+              right: 15,
+              top: index == 0 ? 16 : 8,
+              bottom: 8
+            })
+        }
 
       }, (item: CommonArticlesBean) => item.id)
     }.width('100%')

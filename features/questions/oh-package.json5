@@ -12,6 +12,6 @@
     //模块通用组件
     "lib_components": "file:../lib_components",
     //登录模块
-    "login": "file:../login"
+    "login": "file:../login",
   }
 }

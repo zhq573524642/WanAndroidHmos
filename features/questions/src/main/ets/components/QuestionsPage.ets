@@ -4,9 +4,14 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/
 import { LengthMetrics } from "@kit.ArkUI"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import { ToastUtil } from "utils"
-import { CommonArticlesBean, CommonPagingBean, CommonTagsBean, PageTitleComponent } from "lib_components"
+import {
+  ArticleFromType,
+  CommonArticlesBean, CommonPagingBean,
+  CommonShareArticlePage,
+  CommonTagsBean, PageTitleComponent } from "lib_components"
 import mQuestionsViewModel from "../viewmodel/QuestionsViewModel"
 import { PlazaDataPage } from "./PlazaDataPage"
+import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 
 @Component
 export struct QuestionsPage {
@@ -99,13 +104,21 @@ export struct QuestionsPage {
       LazyForEach(this.questionsList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           QuestionsItemView({
-            item: item
+            item: item,
+            onAuthorClick:(isAuthor:boolean)=>{
+              if (isAuthor) {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author)
+              } else {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId, '分享人:' + item.shareUser)
+              }
+            }
           })
             .onClick(() => {
-              this.questionsPathStack.pushPathByName('QuestionsDetailPage',
-                new Object({
-                  articleDetail: item
-                }), true);
+              // this.questionsPathStack.pushPathByName('QuestionsDetailPage',
+              //   new Object({
+              //     articleDetail: item
+              //   }), true);
+              WebViewPage.startPage('https://www.wanandroid.com/wenda/show/'+item.id)
             })
         }.margin({ left: 12, right: 12 })
       }, (item: CommonArticlesBean) => item.id)
@@ -116,6 +129,7 @@ export struct QuestionsPage {
 @Component
 struct QuestionsItemView {
   item: CommonArticlesBean = new CommonArticlesBean()
+  onAuthorClick?: (isAuthor: boolean) => void
 
   build() {
     Column() {
@@ -166,7 +180,7 @@ struct QuestionsItemView {
         .maxLines(2)
         .lineSpacing(LengthMetrics.vp(2))
         .textAlign(TextAlign.Start)
-        .ellipsisMode(EllipsisMode.END)
+        .textOverflow({overflow:TextOverflow.Ellipsis})
         .margin({ top: 10, bottom: 10 })
       Row() {
         Image($r('app.media.ic_dian_zan')).width(15)
@@ -175,6 +189,10 @@ struct QuestionsItemView {
           .margin({ left: 3, right: 5 })
         Text(this.item.shareUser !== '' ? '分享者:' + this.item.shareUser : '作者:' + this.item.author)
           .fontColor(Color.Grey).fontSize(13)
+          .decoration({ type: TextDecorationType.Underline, color: $r('app.color.app_theme_color') })
+          .onClick(() => {
+            this.onAuthorClick?.(this.item.shareUser == '')
+          })
         Blank().layoutWeight(1)
         Image(this.item.collect ? $r('app.media.ic_collect_select') : $r('app.media.ic_collect_unselect'))
           .objectFit(ImageFit.Cover)

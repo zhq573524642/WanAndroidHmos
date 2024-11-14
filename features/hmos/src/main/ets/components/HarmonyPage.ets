@@ -7,7 +7,8 @@ import HarmonyListBean from "../model/HarmonyListBean";
 import { LengthMetrics } from "@kit.ArkUI";
 import { ToastUtil } from "utils/src/main/ets/utils/ToastUtil";
 import { CommonArticlesBean } from "lib_components";
-import { WebViewPage } from "lib_web";
+import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
+
 
 @Component
 export struct HarmonyPage {

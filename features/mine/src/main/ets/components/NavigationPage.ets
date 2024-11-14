@@ -6,7 +6,7 @@ import { NavigationData } from "../model/NavigationData"
 import mNavigationViewModel from "../viewmodel/NavigationViewModel"
 import { LengthMetrics } from "@kit.ArkUI"
 import { CommonArticlesBean, FeatureUtils } from "lib_components"
-import { WebViewPage } from "lib_web"
+import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 
 @Component
 export struct NavigationPage {

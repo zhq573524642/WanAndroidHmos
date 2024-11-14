@@ -1,9 +1,11 @@
 import { CommonArticlesBean } from "../model/CommonArticlesBean"
 import { LengthMetrics } from "@kit.ArkUI"
+import { CommonTagsBean } from "../model/CommonTagsBean"
 
 @Component
 export struct CommonArticleItem {
   item: CommonArticlesBean = new CommonArticlesBean()
+  onArticleAuthorClick?: (isAuthor: boolean) => void
 
   build() {
     Column() {
@@ -23,8 +25,25 @@ export struct CommonArticleItem {
             .borderWidth(1)
             .margin({ right: 6 })
         }
+        if (this.item.tags.length > 0) {
+          ForEach(this.item.tags, (tag: CommonTagsBean) => {
+            Text(tag.name)
+              .fontColor(Color.Green)
+              .fontSize(11)
+              .padding({
+                left: 6,
+                right: 6,
+                top: 4,
+                bottom: 4
+              })
+              .borderRadius(3)
+              .borderColor(Color.Green)
+              .borderWidth(1)
+              .margin({ right: 6 })
+          })
+        }
         Text(`${this.item.superChapterName}/${this.item.chapterName}`)
-          .fontColor(Color.Blue).fontSize(13)
+          .fontColor($r('app.color.app_theme_color')).fontSize(13)
 
 
         Blank().layoutWeight(1)
@@ -43,6 +62,10 @@ export struct CommonArticleItem {
       Row() {
         Text(this.item.shareUser !== '' ? '分享者：' + this.item.shareUser : '作者：' + this.item.author)
           .fontColor(Color.Grey).fontSize(13)
+          .decoration({ type: TextDecorationType.Underline, color: $r('app.color.app_theme_color') })
+          .onClick(() => {
+            this.onArticleAuthorClick?.(this.item.shareUser == '' )
+          })
         Blank().layoutWeight(1)
         Image(this.item.collect ? $r('app.media.ic_collect_select') : $r('app.media.ic_collect_unselect'))
           .objectFit(ImageFit.Cover)

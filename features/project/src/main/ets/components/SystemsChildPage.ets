@@ -9,7 +9,7 @@ import { SystemChildrenList } from '../model/SystemsListBean'
 import LazyDataSource from 'utils/src/main/ets/utils/LazyDataSource'
 import { ToastUtil } from 'utils'
 import { SystemsSearchPage } from './SystemsSearchPage'
-import { WebViewPage } from 'lib_web'
+import { WebViewPage } from 'lib_components/src/main/ets/components/WebViewPage'
 
 @Entry({ routeName: 'SystemsChildPage' })
 @Component

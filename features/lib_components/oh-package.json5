@@ -8,6 +8,6 @@
   "dependencies": {
     //common工具
     "utils": "file:../../commons/utils",
-    "commons": "file:../../commons/commons"
+    "commons": "file:../../commons/commons",
   }
 }

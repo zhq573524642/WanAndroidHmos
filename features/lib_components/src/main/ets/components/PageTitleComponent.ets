@@ -1,6 +1,6 @@
 @Component
 export struct PageTitleComponent {
-  title: string = '标题'
+  @Prop title: string = '标题'
   titleFontSize?: ResourceStr | number = 30
   isShowLeftIcon?: boolean = false
   isShowRightIcons?: boolean = false

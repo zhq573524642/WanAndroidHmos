@@ -11,8 +11,6 @@
     "commons": "file:../../commons/commons",
     //模块通用组件
     "lib_components": "file:../lib_components",
-    //webview
-    "lib_web": "file:../lib_web",
     //登录模块
     "login": "file:../login",
   }
