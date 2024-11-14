@@ -5,5 +5,6 @@ export class MineApi {
   static readonly API_INTEGRAL_RANK_LIST: string = 'coin/rank/'
   static readonly API_CANCEL_COLLECT_FOR_COLLECTION: string = 'lg/uncollect/'
   static readonly API_GET_USER_INFO: string = 'user/lg/userinfo/json'
-  static readonly API_GET_INTEGRAL_RECORD_LIST:string='lg/coin/list/'
+  static readonly API_GET_INTEGRAL_RECORD_LIST: string = 'lg/coin/list/'
+  static readonly API_TOOLS_LIST: string = 'tools/list/json'
 }

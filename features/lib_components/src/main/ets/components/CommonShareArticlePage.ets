@@ -10,11 +10,14 @@ import { CommonArticleItem } from "./CommonArticleItem"
 import { CoinInfo, CommonUserArticlesBean } from "../model/CommonUserArticlesBean"
 import { CommonViewModel } from "../viewmodel/CommonViewModel"
 import { WebViewPage } from "./WebViewPage"
+import { CommonPagingBean } from "../model/CommonPagingBean"
 
 export enum ArticleFromType {
   ArticleByOther = 1,
   ArticleByAuthor,
-  ArticleBySelf
+  ArticleBySelf,
+  ArticleByOfficialAccount,
+  ArticleBySearch
 }
 
 @Entry({ routeName: 'CommonShareArticlePage' })
@@ -31,8 +34,17 @@ export struct CommonShareArticlePage {
   @State msgError: string = '数据异常'
   @State userId: number = 0
   @State userTitle: string = ''
+  @State articleFromType: ArticleFromType = ArticleFromType.ArticleByOther
   @State userCoinInfo: CoinInfo = new CoinInfo()
   @State totalArticles: number = 0
+  @State isShowUserInfo: boolean = false
+  @State isShowSearchIcon: boolean = false
+  @State isShowSearchLayout: boolean = false
+  //临时保存一下数据
+  @State tempDataList: LazyDataSource<CommonArticlesBean> = new LazyDataSource()
+  @State tempPageIndex: number = 1
+  @State tempIsAllLoadOver: boolean = false
+  @State inputContent: string = ''
 
   static startPage(fromType: ArticleFromType, userId: number, title: string) {
     RouterUtil.pushNamedRoute('CommonShareArticlePage', {
@@ -47,8 +59,26 @@ export struct CommonShareArticlePage {
     if (params) {
       this.userId = params.userId as number
       this.userTitle = params.title as string
+      this.articleFromType = params.articleFromType as ArticleFromType
     }
-    this.getShareArticleList()
+    this.getRequestByFromType()
+  }
+
+  private getRequestByFromType() {
+    if (this.articleFromType == ArticleFromType.ArticleByOther) {
+      this.isShowUserInfo = true
+      this.getShareArticleList()
+    } else if (this.articleFromType == ArticleFromType.ArticleByAuthor) {
+
+    } else if (this.articleFromType == ArticleFromType.ArticleBySelf) {
+
+    } else if (this.articleFromType == ArticleFromType.ArticleByOfficialAccount) {
+      this.isShowUserInfo = false
+      this.isShowSearchIcon = true
+      this.getOfficialAccountArticleList()
+    } else if (this.articleFromType == ArticleFromType.ArticleBySearch) {
+      this.getArticleSearch()
+    }
   }
 
   build() {
@@ -58,43 +88,89 @@ export struct CommonShareArticlePage {
         isShowLeftIcon: true,
         onLeftIconClick: () => {
           router.back()
+        },
+        isShowRightIcons: this.isShowSearchIcon,
+        rightIcons: [$r('app.media.ic_search')],
+        onRightIconClick: (icon: ResourceStr, index: number) => {
+          this.isShowSearchLayout = !this.isShowSearchLayout
         }
       })
-      Column({ space: 12 }) {
+
+      if (this.isShowSearchLayout) {
         Row() {
-          Text('本站积分：').fontColor(Color.Black).fontSize(15)
-          Text(`${this.userCoinInfo.coinCount}`).fontColor(Color.Red).fontSize(16)
-          Text(`lv ${this.userCoinInfo.level}`)
-            .fontSize(15)
-            .fontColor(Color.White)
-            .backgroundColor(Color.Green)
-            .padding({
-              top: 4,
-              bottom: 4,
-              left: 7,
-              right: 7
+          Search({ placeholder: '请输入搜索关键词' })
+            .searchButton('搜索')
+            .fontColor(Color.Black)
+            .onChange((value: string) => {
+              if (value === '') {
+                this.articleFromType = ArticleFromType.ArticleByOfficialAccount
+                this.dataList.clear()
+                this.tempDataList.dataArray.forEach((value:CommonArticlesBean)=>{
+                  this.dataList.pushData(value)
+                })
+                this.pageIndex = this.tempPageIndex
+                this.isAllLoadOver = this.tempIsAllLoadOver
+                this.dataList.notifyDataReload()
+              }
             })
-            .margin({ left: 12 })
-            .borderRadius(5)
-          Text(`排名 ${this.userCoinInfo.rank}`)
-            .fontSize(15)
-            .fontColor(Color.White)
-            .backgroundColor(Color.Pink)
-            .padding({
-              top: 4,
-              bottom: 4,
-              left: 7,
-              right: 7
+            .onSubmit((value: string) => {
+              if (value.length <= 0) {
+                ToastUtil.showToast('请输入搜索关键词')
+                return
+              }
+              this.articleFromType = ArticleFromType.ArticleBySearch
+              this.dataList.dataArray.forEach((value:CommonArticlesBean)=>{
+                this.tempDataList.pushData(value)
+              })
+              this.tempPageIndex = this.pageIndex
+              this.tempIsAllLoadOver = this.isAllLoadOver
+
+              this.pageIndex = 1
+              this.inputContent = value
+              this.getRequestByFromType()
             })
-            .margin({ left: 12 })
-            .borderRadius(5)
-        }
+            .height(50)
+            .layoutWeight(1)
+        }.padding({ left: 20, right: 20 })
+        .width('100%')
+      }
+      if (this.isShowUserInfo) {
+        Column({ space: 12 }) {
+          Row() {
+            Text('本站积分：').fontColor(Color.Black).fontSize(15)
+            Text(`${this.userCoinInfo.coinCount}`).fontColor(Color.Red).fontSize(16)
+            Text(`lv ${this.userCoinInfo.level}`)
+              .fontSize(15)
+              .fontColor(Color.White)
+              .backgroundColor(Color.Green)
+              .padding({
+                top: 4,
+                bottom: 4,
+                left: 7,
+                right: 7
+              })
+              .margin({ left: 12 })
+              .borderRadius(5)
+            Text(`排名 ${this.userCoinInfo.rank}`)
+              .fontSize(15)
+              .fontColor(Color.White)
+              .backgroundColor(Color.Pink)
+              .padding({
+                top: 4,
+                bottom: 4,
+                left: 7,
+                right: 7
+              })
+              .margin({ left: 12 })
+              .borderRadius(5)
+          }
 
-        Text(`分享了${this.totalArticles}篇文章`).fontColor(Color.Gray).fontSize(15)
+          Text(`分享了${this.totalArticles}篇文章`).fontColor(Color.Gray).fontSize(15)
 
-      }.padding(20)
-      .width('100%')
-      .alignItems(HorizontalAlign.Start)
+        }.padding(20)
+        .width('100%')
+        .alignItems(HorizontalAlign.Start)
+      }
 
       BasePage({
         pageState: this.pageState,
@@ -106,7 +182,7 @@ export struct CommonShareArticlePage {
         },
         onRefreshing: () => {
           this.pageIndex = 1
-          this.getShareArticleList()
+          this.getRequestByFromType()
         },
         onLoadingMore: () => {
           if (this.isAllLoadOver) {
@@ -114,10 +190,10 @@ export struct CommonShareArticlePage {
             this.loadMoreStatus = FooterLoadMoreStatus.inactive
             return
           }
-          this.getShareArticleList()
+          this.getRequestByFromType()
         },
         onErrorRetryCallback: () => {
-          this.getShareArticleList()
+          this.getRequestByFromType()
         }
       })
     }.width('100%')
@@ -126,7 +202,7 @@ export struct CommonShareArticlePage {
   }
 
   private getShareArticleList() {
-    this.mCommonViewModel.getArticlesList(this.userId, this.pageIndex)
+    this.mCommonViewModel.getShareArticlesList(this.userId, this.pageIndex)
       .then((data: CommonUserArticlesBean) => {
         this.userCoinInfo = data.coinInfo
         let bean = data.shareArticles
@@ -140,11 +216,63 @@ export struct CommonShareArticlePage {
           this.pageState = DefaultStateEnum.EMPTY
         }
         if (bean.curPage == 1) {
-          this.pageIndex = 0
+          this.pageIndex = 1
           this.dataList.clear()
         }
         this.pageIndex++
         this.dataList.appendArrayData(bean.datas)
+      })
+      .catch((msg: string) => {
+        this.msgError = msg
+        this.pageState = DefaultStateEnum.ERROR
+        this.refreshStatus = HeaderRefreshStatus.inactive
+        this.loadMoreStatus = FooterLoadMoreStatus.inactive
+      })
+  }
+
+  private getOfficialAccountArticleList() {
+    this.mCommonViewModel.getWxArticlesList(this.userId, this.pageIndex)
+      .then((data: CommonPagingBean<CommonArticlesBean>) => {
+        this.isAllLoadOver = data.over
+        this.refreshStatus = HeaderRefreshStatus.inactive
+        this.loadMoreStatus = FooterLoadMoreStatus.inactive
+        if (data.total > 0) {
+          this.pageState = DefaultStateEnum.NORMAL
+        } else {
+          this.pageState = DefaultStateEnum.EMPTY
+        }
+        if (data.curPage == 1) {
+          this.pageIndex = 1
+          this.dataList.clear()
+        }
+        this.pageIndex++
+        this.dataList.appendArrayData(data.datas)
+      })
+      .catch((msg: string) => {
+        this.msgError = msg
+        this.pageState = DefaultStateEnum.ERROR
+        this.refreshStatus = HeaderRefreshStatus.inactive
+        this.loadMoreStatus = FooterLoadMoreStatus.inactive
+      })
+  }
+
+  private getArticleSearch() {
+    this.mCommonViewModel.getSearchWxArticlesList(this.userId, this.pageIndex, this.inputContent)
+      .then((data: CommonPagingBean<CommonArticlesBean>) => {
+        this.isAllLoadOver = data.over
+        this.refreshStatus = HeaderRefreshStatus.inactive
+        this.loadMoreStatus = FooterLoadMoreStatus.inactive
+        if (data.total > 0) {
+          this.pageState = DefaultStateEnum.NORMAL
+        } else {
+          this.pageState = DefaultStateEnum.EMPTY
+        }
+        if (data.curPage == 1) {
+          this.pageIndex = 1
+          this.dataList.clear()
+        }
+        this.pageIndex++
+        this.dataList.appendArrayData(data.datas)
       })
       .catch((msg: string) => {
         this.msgError = msg

@@ -4,7 +4,7 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/
 import { LengthMetrics } from "@kit.ArkUI"
 import { OfficialAccountBean } from "../model/OfficialAccountBean"
 import mAccountViewModel from "../viewmodel/AccountViewModel"
-import { FeatureUtils } from "lib_components"
+import { ArticleFromType, CommonShareArticlePage, FeatureUtils } from "lib_components"
 
 @Component
 export struct OfficialAccountsPage {
@@ -63,21 +63,23 @@ export struct OfficialAccountsPage {
   @Builder
   ContentListView(scroller: Scroller) {
     Scroll(scroller) {
-        Flex({
-          justifyContent: FlexAlign.Start,
-          wrap: FlexWrap.Wrap,
-          direction: FlexDirection.Row,
-          space: { main: LengthMetrics.vp(12), cross: LengthMetrics.vp(12) }
-        }) {
-          ForEach(this.accountList, (item: OfficialAccountBean) => {
-            AccountView({
-              item: item
+      Flex({
+        justifyContent: FlexAlign.Start,
+        wrap: FlexWrap.Wrap,
+        direction: FlexDirection.Row,
+        space: { main: LengthMetrics.vp(12), cross: LengthMetrics.vp(12) }
+      }) {
+        ForEach(this.accountList, (item: OfficialAccountBean) => {
+          AccountView({
+            item: item
+          })
+            .onClick(() => {
+              CommonShareArticlePage.startPage(ArticleFromType.ArticleByOfficialAccount, item.id, item.name)
             })
-          }, (item: OfficialAccountBean) => item.id + '')
-        }
-        .padding(12)
-        .width('100%')
-
+        }, (item: OfficialAccountBean) => item.id + '')
+      }
+      .padding(12)
+      .width('100%')
 
     }.width('100%')
 

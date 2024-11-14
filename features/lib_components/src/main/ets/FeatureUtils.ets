@@ -24,6 +24,10 @@ export class FeatureUtils {
     return color;
   }
 
+  static getGrayBgColor():ResourceStr{
+    return $r('sys.color.ohos_id_color_sub_background')
+  }
+
 
   //收藏文章
   handleCollectArticle(id: string): Promise<ResponseResultC<''>> {

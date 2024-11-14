@@ -41,7 +41,7 @@ export struct IntegralPage {
         title: '积分',
         isShowLeftIcon: true,
         isShowRightTexts: true,
-        rightTexts: ['记录'],
+        rightTexts: ['我的积分获取记录'],
         onLeftIconClick: () => {
           router.back()
         },
@@ -129,13 +129,14 @@ export struct IntegralPage {
           }
         }, (item: IntegralBean) => item.userId)
       }
+      .layoutWeight(1)
       .divider({
         strokeWidth: 1,
         startMargin: 20,
         endMargin: 20,
         color: '#F5F5F5'
       })
-    }
+    }.layoutWeight(1)
   }
 }
 

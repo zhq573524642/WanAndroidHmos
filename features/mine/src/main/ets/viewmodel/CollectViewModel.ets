@@ -1,16 +1,15 @@
 import { BaseViewModel } from 'commons';
+import { CommonArticlesBean, CommonPagingBean } from 'lib_components';
 import { httpARequestGet, httpFormRequestPost, ResponseResultC } from 'utils';
 import { MineApi } from '../api/MineApi';
-import { CollectionsBean } from '../model/CollectionsBean';
-import { OfficialAccountBean } from '../model/OfficialAccountBean';
 
 class CollectViewModel extends BaseViewModel {
   //获取收藏列表
-  getCollectionsList(pageIndex: number): Promise<CollectionsBean> {
-    return new Promise<CollectionsBean>(async (resolve, reject) => {
+  getCollectionsList(pageIndex: number): Promise<CommonPagingBean<CommonArticlesBean>> {
+    return new Promise<CommonPagingBean<CommonArticlesBean>>(async (resolve, reject) => {
 
-      httpARequestGet<ResponseResultC<CollectionsBean>>(MineApi.API_COLLECTIONS + pageIndex + '/json')
-        .then((data: ResponseResultC<CollectionsBean>) => {
+      httpARequestGet<ResponseResultC<CommonPagingBean<CommonArticlesBean>>>(MineApi.API_COLLECTIONS + pageIndex + '/json')
+        .then((data: ResponseResultC<CommonPagingBean<CommonArticlesBean>>) => {
           if (data.errorCode === 0) {
             resolve(data.data)
           } else {

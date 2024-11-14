@@ -1,20 +1,21 @@
 import { BasePage } from "commons"
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum"
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh"
-import { CollectionsBean, CollectionsList } from "../model/CollectionsBean"
 import { LengthMetrics } from "@kit.ArkUI"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import mCollectViewModel from "../viewmodel/CollectViewModel"
 import { AppConstant, EmitterUtils, ResponseResultC, ToastUtil } from "utils"
 import { emitter } from "@kit.BasicServicesKit"
 import { data } from "@kit.TelephonyKit"
+import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
+import { CommonArticlesBean, CommonPagingBean } from "lib_components"
 
 @Component
 export struct CollectionsPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
-  @State collectionsList: LazyDataSource<CollectionsList> = new LazyDataSource()
+  @State collectionsList: LazyDataSource<CommonArticlesBean> = new LazyDataSource()
   @State pageIndex: number = 0
   @State msgError: string = '数据异常'
   @State msgNoData: string = '暂无收藏'
@@ -68,7 +69,7 @@ export struct CollectionsPage {
 
   private requestCollectionsList() {
     mCollectViewModel.getCollectionsList(this.pageIndex)
-      .then((data: CollectionsBean) => {
+      .then((data: CommonPagingBean<CommonArticlesBean>) => {
         this.isAllLoadOver = data.over
         if (data.total == 0) {
           this.pageState = DefaultStateEnum.EMPTY
@@ -95,25 +96,25 @@ export struct CollectionsPage {
   @Builder
   ContentListView(scroller: Scroller) {
     List({ scroller: scroller, space: 12 }) {
-      LazyForEach(this.collectionsList, (item: CollectionsList, index: number) => {
+      LazyForEach(this.collectionsList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           CollectionItemView({
             item: item,
             index: index,
-            onCollectRemove: (data: CollectionsList, i: number) => {
+            onCollectRemove: (data: CommonArticlesBean, i: number) => {
               this.handleCancelCollect(item, index)
             }
           })
             .onClick(() => {
-
+              WebViewPage.startPage(item.link, true, item.title)
             })
         }
         .padding({ left: 15, right: 15 })
-      }, (item: CollectionsList) => item.id)
+      }, (item: CommonArticlesBean) => item.id)
     }.width('100%')
   }
 
-  private handleCancelCollect(item: CollectionsList, index: number) {
+  private handleCancelCollect(item: CommonArticlesBean, index: number) {
     mCollectViewModel.handleCollect(item.id, item.originId)
       .then((data: ResponseResultC<''>) => {
         if (data.errorCode === 0) {
@@ -132,9 +133,9 @@ export struct CollectionsPage {
 
 @Component
 struct CollectionItemView {
-  item: CollectionsList = new CollectionsList()
+  item: CommonArticlesBean = new CommonArticlesBean()
   index: number = 0
-  onCollectRemove?: (data: CollectionsList, index: number) => void
+  onCollectRemove?: (data: CommonArticlesBean, index: number) => void
 
   build() {
     Row() {

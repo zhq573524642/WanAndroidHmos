@@ -1,7 +1,6 @@
 import { BaseViewModel } from 'commons';
 import { httpARequestGet, ResponseResultC } from 'utils';
 import { MineApi } from '../api/MineApi';
-import { CollectionsBean } from '../model/CollectionsBean';
 import { OfficialAccountBean } from '../model/OfficialAccountBean';
 
 class AccountViewModel extends BaseViewModel {

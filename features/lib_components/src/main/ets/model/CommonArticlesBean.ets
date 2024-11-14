@@ -20,4 +20,5 @@ export class CommonArticlesBean {
   envelopePic: string = ''
   projectLink: string = ''
   userId: number = 0
+  originId:string=''
 }

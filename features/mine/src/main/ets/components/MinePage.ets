@@ -7,6 +7,7 @@ import { emitter } from '@kit.BasicServicesKit';
 import mMineViewModel from '../viewmodel/MineViewModel';
 import { UserInfo, UserInfoBean } from '../model/UserInfoBean';
 import { IntegralBean } from '../model/IntegralBean';
+import { SettingPage } from './SettingPage';
 
 import('login/src/main/ets/components/LoginPage');
 
@@ -95,7 +96,8 @@ export struct MinePage {
         .objectFit(ImageFit.Cover)
         .margin({ right: 20 })
         .onClick(() => {
-          RouterUtil.pushNamedRoute('LoginPage')
+          // RouterUtil.pushNamedRoute('LoginPage')
+          SettingPage.startPage()
         })
     }.width('100%')
     .margin({ top: 10, bottom: 10 })
