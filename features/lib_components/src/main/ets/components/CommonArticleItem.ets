@@ -5,7 +5,9 @@ import { CommonTagsBean } from "../model/CommonTagsBean"
 @Component
 export struct CommonArticleItem {
   item: CommonArticlesBean = new CommonArticlesBean()
+  isShowChapterName?: boolean = true
   onArticleAuthorClick?: (isAuthor: boolean) => void
+  onArticleCollect?: (isCollected: boolean) => void
 
   build() {
     Column() {
@@ -42,10 +44,10 @@ export struct CommonArticleItem {
               .margin({ right: 6 })
           })
         }
-        Text(`${this.item.superChapterName}/${this.item.chapterName}`)
-          .fontColor($r('app.color.app_theme_color')).fontSize(13)
-
-
+        if (this.isShowChapterName) {
+          Text(`${this.item.superChapterName}/${this.item.chapterName}`)
+            .fontColor($r('app.color.app_theme_color')).fontSize(13)
+        }
         Blank().layoutWeight(1)
         Text(this.item.niceDate).fontColor(Color.Gray).fontSize(12)
       }.alignItems(VerticalAlign.Center)
@@ -71,6 +73,9 @@ export struct CommonArticleItem {
           .objectFit(ImageFit.Cover)
           .width(25)
           .height(25)
+          .onClick(() => {
+            this.onArticleCollect?.(this.item.collect)
+          })
       }.alignItems(VerticalAlign.Center)
 
     }

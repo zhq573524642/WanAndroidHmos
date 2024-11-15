@@ -4,8 +4,8 @@ import { CommonTagsBean } from "./CommonTagsBean"
 export class CommonArticlesBean {
   author: string = ''
   shareUser: string = ''
-  superChapterName: string = ''
-  chapterName: string = ''
+  superChapterName: string = '--'
+  chapterName: string = '--'
   link: string = ''
   collect: boolean = false
   id: string = ''

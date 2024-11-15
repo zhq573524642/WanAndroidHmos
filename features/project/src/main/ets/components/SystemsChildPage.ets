@@ -1,11 +1,17 @@
-import { CommonArticlesBean, CommonPagingBean, PageTitleComponent } from 'lib_components'
+import {
+  ArticleFromType,
+  CommonArticleItem,
+  CommonArticlesBean,
+  CommonPagingBean,
+  CommonShareArticlePage,
+  PageTitleComponent
+} from 'lib_components'
 import { RouterUtil } from 'utils/src/main/ets/utils/RouterUtil'
 import { LengthMetrics, router } from '@kit.ArkUI'
 import { BasePage } from 'commons/src/main/ets/base/BasePage'
 import { DefaultStateEnum } from 'commons/src/main/ets/components/defaultState/DefaultStateEnum'
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from 'commons/src/main/ets/components/SVRefresh/SVRefresh'
 import mSystemsViewModel from '../viewmodel/SystemsViewModel'
-import { SystemChildrenList } from '../model/SystemsListBean'
 import LazyDataSource from 'utils/src/main/ets/utils/LazyDataSource'
 import { ToastUtil } from 'utils'
 import { SystemsSearchPage } from './SystemsSearchPage'
@@ -43,9 +49,13 @@ export struct SystemsChildPage {
     Column() {
       PageTitleComponent({
         title: this.title,
+        isShowLeftIcon: true,
+        onLeftIconClick: () => {
+          router.back()
+        },
         isShowRightIcons: true,
         rightIcons: [$r('app.media.ic_search')],
-        onRightIconClick: (icon:ResourceStr,index:number) => {
+        onRightIconClick: (icon: ResourceStr, index: number) => {
           SystemsSearchPage.startPage()
         }
       })
@@ -108,73 +118,26 @@ export struct SystemsChildPage {
     List({ scroller: scroller, space: 12 }) {
       LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
-          SystemsChildItemView({
-            item: item
+          CommonArticleItem({
+            item: item,
+            isShowChapterName: false,
+            onArticleAuthorClick: (isAuthor: boolean) => {
+              if (isAuthor) {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, item.title)
+              } else {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId, item.title)
+              }
+            }
           })
+            .onClick(() => {
+              WebViewPage.startPage(item.link, true, item.title)
+            })
         }.margin({ left: 20, right: 20 })
-        .onClick(() => {
-          WebViewPage.startPage(item.link, true, item.title)
-        })
+
       }, (item: CommonArticlesBean) => item.id + '')
     }.width('100%')
     .margin({ bottom: 20 })
     .layoutWeight(1)
     .cachedCount(4)
-  }
-}
-
-@Component
-export struct SystemsChildItemView {
-  item: CommonArticlesBean = new CommonArticlesBean()
-
-  build() {
-    Column() {
-      Row() {
-        if (this.item.fresh) {
-          Text('新')
-            .fontColor(Color.Red)
-            .fontSize(11)
-            .padding({
-              left: 6,
-              right: 6,
-              top: 4,
-              bottom: 4
-            })
-            .borderRadius(3)
-            .borderColor(Color.Red)
-            .borderWidth(1)
-            .margin({ right: 6 })
-        }
-        // Text(`${this.item.superChapterName}/${this.item.chapterName}`)
-        //   .fontColor(Color.Blue).fontSize(13)
-        Blank().layoutWeight(1)
-        Text(this.item.niceDate).fontColor(Color.Gray).fontSize(12)
-      }.alignItems(VerticalAlign.Center)
-
-      Text(this.item.title)
-        .fontColor(Color.Black)
-        .fontSize(15)
-        .width('100%')
-        .maxLines(2)
-        .lineSpacing(LengthMetrics.vp(2))
-        .textAlign(TextAlign.Start)
-        .ellipsisMode(EllipsisMode.END)
-        .margin({ top: 10, bottom: 10 })
-      Row() {
-        Text(this.item.shareUser !== '' ? '分享者：' + this.item.shareUser : '作者：' + this.item.author)
-          .fontColor(Color.Grey).fontSize(13)
-        Blank().layoutWeight(1)
-        Image(this.item.collect ? $r('app.media.ic_collect_select') : $r('app.media.ic_collect_unselect'))
-          .objectFit(ImageFit.Cover)
-          .width(25)
-          .height(25)
-      }.alignItems(VerticalAlign.Center)
-
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start)
-    .borderRadius(10)
-    .backgroundColor(Color.White)
-    .padding(15)
   }
 }

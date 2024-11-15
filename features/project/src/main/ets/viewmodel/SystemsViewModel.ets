@@ -41,11 +41,13 @@ class SystemsViewModel extends BaseViewModel {
   }
 
   getSearchAuthorData(pageIndex: number, author: string): Promise<CommonPagingBean<CommonArticlesBean>> {
+    this.showMsgLoading('搜索中..')
     return new Promise<CommonPagingBean<CommonArticlesBean>>(async (resolve, reject) => {
       httpARequestGet<ResponseResultC<CommonPagingBean<CommonArticlesBean>>>(
         'article/list/' + pageIndex + '/json?author=' + author
       )
         .then((data: ResponseResultC<CommonPagingBean<CommonArticlesBean>>) => {
+          this.hideLoading()
           if (data.errorCode === 0) {
             resolve(data.data)
           } else {
@@ -53,6 +55,7 @@ class SystemsViewModel extends BaseViewModel {
           }
         })
         .catch((error: string) => {
+          this.hideLoading()
           reject(error)
         })
     })

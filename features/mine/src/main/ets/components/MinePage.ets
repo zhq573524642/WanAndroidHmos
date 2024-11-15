@@ -82,11 +82,19 @@ export struct MinePage {
   MineToolsView() {
     Row() {
       Blank().layoutWeight(1)
+      Image($r('app.media.ic_todo'))
+        .width(25)
+        .height(25)
+        .objectFit(ImageFit.Cover)
+        .margin({ right: 16 })
+        .onClick(() => {
+          this.minePathStack.pushPathByName('MyTodoPage', '', true)
+        })
       Image($r('app.media.ic_integral'))
         .width(25)
         .height(25)
         .objectFit(ImageFit.Cover)
-        .margin({ right: 20 })
+        .margin({ right: 16 })
         .onClick(() => {
           IntegralPage.startPage()
         })

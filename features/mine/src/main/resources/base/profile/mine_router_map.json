@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "MyTodoPage",
+      "pageSourceFile": "src/main/ets/components/MyTodoPage.ets",
+      "buildFunction": "MyTodoPageBuilder"
+    }
+  ]
+}

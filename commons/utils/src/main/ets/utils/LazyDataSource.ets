@@ -110,6 +110,11 @@ export default class LazyDataSource<T> extends BasicDataSource<T> {
     this.notifyDataDelete(index);
   }
 
+  public changeData(index: number, data: T): void {
+    this.dataArray.splice(index, 1, data);
+    this.notifyDataChange(index);
+  }
+
   public getDataList(): ObservedArray<T> {
     return this.dataArray;
   }

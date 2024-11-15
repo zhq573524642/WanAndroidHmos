@@ -15,4 +15,6 @@ export class AppConstant {
   //Emitter Flag
   static readonly FLAG_NO_LOGIN: number = -1001
   static readonly FLAG_LOGIN_SUCCESS: number = 100101
+  static readonly FLAG_CREATE_TODO: number = 100102
+  static readonly FLAG_UPDATE_TODO: number = 100103
 }

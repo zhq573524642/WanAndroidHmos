@@ -7,4 +7,7 @@ export class MineApi {
   static readonly API_GET_USER_INFO: string = 'user/lg/userinfo/json'
   static readonly API_GET_INTEGRAL_RECORD_LIST: string = 'lg/coin/list/'
   static readonly API_TOOLS_LIST: string = 'tools/list/json'
+  static readonly API_TODO_LIST: string = 'lg/todo/v2/list/'
+  static readonly API_TODO_CREATE: string = 'lg/todo/add/json'
+  static readonly API_TODO_UPDATE: string = 'lg/todo/update/'
 }

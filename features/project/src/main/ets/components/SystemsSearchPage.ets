@@ -4,9 +4,8 @@ import { BasePage } from "commons";
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum";
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh";
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
-import { CommonArticlesBean, CommonPagingBean } from "lib_components";
+import { CommonArticleItem, CommonArticlesBean, CommonPagingBean, FeatureUtils } from "lib_components";
 import mSystemsViewModel from "../viewmodel/SystemsViewModel";
-import { SystemsChildItemView } from "./SystemsChildPage";
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
 
 @Entry({ routeName: 'SystemsSearchPage' })
@@ -23,6 +22,7 @@ export struct SystemsSearchPage {
   @State pageIndex: number = 0
   @State isAllLoadOver: boolean = false
   @State inputContent: string = ''
+  @State msgNoData: string = '未搜索到结果'
 
   build() {
     Column() {
@@ -42,17 +42,19 @@ export struct SystemsSearchPage {
               ToastUtil.showToast('请输入作者昵称')
               return
             }
-            this.inputContent=value
+            this.inputContent = value
             this.requestSearch()
           })
           .height(50)
           .layoutWeight(1)
       }.padding({ left: 20, right: 20 })
+      .backgroundColor(Color.White)
 
       BasePage({
         pageState: this.pageState,
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
+        msgNoData: this.msgNoData,
         ContentViewPage: (_scroller: Scroller) => {
           this.ListView(_scroller)
         },
@@ -73,13 +75,14 @@ export struct SystemsSearchPage {
         }
       })
         .width('100%')
+        .backgroundColor(FeatureUtils.getGrayBgColor())
         .layoutWeight(1)
     }.width('100%')
     .height('100%')
   }
 
   private requestSearch() {
-    mSystemsViewModel.getSearchAuthorData(this.pageIndex,this.inputContent)
+    mSystemsViewModel.getSearchAuthorData(this.pageIndex, this.inputContent)
       .then((data: CommonPagingBean<CommonArticlesBean>) => {
         if (data.total === 0) {
           this.pageState = DefaultStateEnum.EMPTY
@@ -105,19 +108,24 @@ export struct SystemsSearchPage {
 
   @Builder
   ListView(_scroller: Scroller) {
-    List({ scroller: _scroller, space: 12 }) {
+    List({ scroller: _scroller }) {
       LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
-          SystemsChildItemView({
-            item: item
+          CommonArticleItem({
+            item: item,
           })
-        }.margin({ left: 20, right: 20 })
+        }
+        .margin({
+          left: 20,
+          right: 20,
+          top: index == 0 ? 12 : 6,
+          bottom: 6
+        })
         .onClick(() => {
           WebViewPage.startPage(item.link, true, item.title)
         })
       }, (item: CommonArticlesBean) => item.id + '')
     }.width('100%')
-    .margin({ bottom: 20 })
     .layoutWeight(1)
     .cachedCount(4)
   }
