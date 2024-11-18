@@ -3,12 +3,16 @@ import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/D
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh"
 import { LengthMetrics } from "@kit.ArkUI"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
-import { ToastUtil } from "utils"
+import { ResponseResultC, ToastUtil } from "utils"
 import {
   ArticleFromType,
-  CommonArticlesBean, CommonPagingBean,
+  CommonArticlesBean,
+  CommonPagingBean,
   CommonShareArticlePage,
-  CommonTagsBean, PageTitleComponent } from "lib_components"
+  CommonTagsBean,
+  FeatureUtils,
+  PageTitleComponent
+} from "lib_components"
 import mQuestionsViewModel from "../viewmodel/QuestionsViewModel"
 import { PlazaDataPage } from "./PlazaDataPage"
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
@@ -105,12 +109,16 @@ export struct QuestionsPage {
         ListItem() {
           QuestionsItemView({
             item: item,
-            onAuthorClick:(isAuthor:boolean)=>{
+            onAuthorClick: (isAuthor: boolean) => {
               if (isAuthor) {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author)
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author,item.author)
               } else {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId, '分享人:' + item.shareUser)
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId,
+                  '分享人:' + item.shareUser)
               }
+            },
+            onArticleCollect: (isCollected: boolean) => {
+              this.handleCollectArticle(item, index, !isCollected)
             }
           })
             .onClick(() => {
@@ -118,18 +126,40 @@ export struct QuestionsPage {
               //   new Object({
               //     articleDetail: item
               //   }), true);
-              WebViewPage.startPage('https://www.wanandroid.com/wenda/show/'+item.id)
+              WebViewPage.startPage('https://www.wanandroid.com/wenda/show/' + item.id)
             })
         }.margin({ left: 12, right: 12 })
-      }, (item: CommonArticlesBean) => item.id)
+      }, (item: CommonArticlesBean) => item.id+'-'+item.collect)
     }.width('100%')
+  }
+
+  private handleCollectArticle(item: CommonArticlesBean, index: number, isCollect: boolean) {
+    mQuestionsViewModel.showLoading()
+    FeatureUtils.getInstance().handleCollectArticle(item.id, isCollect)
+      .then((data: ResponseResultC<''>) => {
+        mQuestionsViewModel.hideLoading()
+        if (data.errorCode === 0) {
+          ToastUtil.showToast(isCollect ? '收藏成功' : '取消收藏成功')
+          let updateItem = new CommonArticlesBean()
+          updateItem = item
+          updateItem.collect = isCollect
+          this.questionsList.changeData(index, updateItem)
+        } else {
+          ToastUtil.showToast(isCollect ? '收藏失败' : '取消收藏失败')
+        }
+      })
+      .catch((msg: string) => {
+        mQuestionsViewModel.hideLoading()
+        ToastUtil.showToast(msg)
+      })
   }
 }
 
 @Component
 struct QuestionsItemView {
-  item: CommonArticlesBean = new CommonArticlesBean()
+  @ObjectLink item: CommonArticlesBean
   onAuthorClick?: (isAuthor: boolean) => void
+  onArticleCollect?: (isCollected: boolean) => void
 
   build() {
     Column() {
@@ -180,7 +210,7 @@ struct QuestionsItemView {
         .maxLines(2)
         .lineSpacing(LengthMetrics.vp(2))
         .textAlign(TextAlign.Start)
-        .textOverflow({overflow:TextOverflow.Ellipsis})
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
         .margin({ top: 10, bottom: 10 })
       Row() {
         Image($r('app.media.ic_dian_zan')).width(15)
@@ -198,6 +228,9 @@ struct QuestionsItemView {
           .objectFit(ImageFit.Cover)
           .width(25)
           .height(25)
+          .onClick(() => {
+            this.onArticleCollect?.(this.item.collect)
+          })
       }.alignItems(VerticalAlign.Center)
 
     }

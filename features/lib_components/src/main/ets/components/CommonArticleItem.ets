@@ -4,7 +4,8 @@ import { CommonTagsBean } from "../model/CommonTagsBean"
 
 @Component
 export struct CommonArticleItem {
-  item: CommonArticlesBean = new CommonArticlesBean()
+  @ObjectLink
+  item: CommonArticlesBean
   isShowChapterName?: boolean = true
   onArticleAuthorClick?: (isAuthor: boolean) => void
   onArticleCollect?: (isCollected: boolean) => void

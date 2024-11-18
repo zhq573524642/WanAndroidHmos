@@ -22,7 +22,7 @@ class CollectViewModel extends BaseViewModel {
     })
   }
 
-  handleCollect(id: string, originId: string): Promise<ResponseResultC<''>> {
+  handleCancelCollect(id: string, originId: string): Promise<ResponseResultC<''>> {
     this.showLoading()
     return new Promise<ResponseResultC<''>>(async (resolve, reject) => {
       let param: Record<string, Object> = {

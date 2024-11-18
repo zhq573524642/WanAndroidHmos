@@ -102,7 +102,7 @@ export struct CollectionsPage {
             item: item,
             index: index,
             onCollectRemove: (data: CommonArticlesBean, i: number) => {
-              this.handleCancelCollect(item, index)
+              this.handleCancelCollect(data, i)
             }
           })
             .onClick(() => {
@@ -112,28 +112,33 @@ export struct CollectionsPage {
         .padding({ left: 15, right: 15 })
       }, (item: CommonArticlesBean) => item.id)
     }.width('100%')
+    .cachedCount(4)
   }
 
   private handleCancelCollect(item: CommonArticlesBean, index: number) {
-    mCollectViewModel.handleCollect(item.id, item.originId)
+    mCollectViewModel.handleCancelCollect(item.id, item.originId)
       .then((data: ResponseResultC<''>) => {
         if (data.errorCode === 0) {
           ToastUtil.showToast('已取消收藏')
           this.collectionsList.deleteData(index)
+          this.collectionsList.reloadData()
           if (this.collectionsList.isEmpty()) {
             this.pageState = DefaultStateEnum.EMPTY
           }
+        } else {
+          ToastUtil.showToast('取消收藏失败')
         }
       })
       .catch((msg: string) => {
-        ToastUtil.showToast('取消收藏失败')
+        ToastUtil.showToast(msg)
       })
   }
 }
 
 @Component
 struct CollectionItemView {
-  item: CommonArticlesBean = new CommonArticlesBean()
+  @ObjectLink
+  item: CommonArticlesBean
   index: number = 0
   onCollectRemove?: (data: CommonArticlesBean, index: number) => void
 

@@ -2,9 +2,16 @@ import { LengthMetrics, router } from "@kit.ArkUI"
 import { BasePage } from "commons"
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum"
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh"
-import { CommonArticleItem, CommonArticlesBean, CommonPagingBean, FeatureUtils } from "lib_components"
+import {
+  ArticleFromType,
+  CommonArticleItem,
+  CommonArticlesBean,
+  CommonPagingBean,
+  CommonShareArticlePage,
+  FeatureUtils
+} from "lib_components"
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
-import { RouterUtil, ToastUtil } from "utils"
+import { ResponseResultC, RouterUtil, ToastUtil } from "utils"
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import { CommonWebSiteBean } from "../model/CommonWebSiteBean"
 import { SearchHotWord } from "../model/SearchHotWordBean"
@@ -102,6 +109,7 @@ export struct HomeSearchPage {
         this.isAllLoadOver = data.over
         this.isShowSearchResultLayout = data.total > 0
         if (this.pageIndex == 0) {
+          this.pageIndex = 0
           this.dataList.clear()
         }
         this.pageIndex++
@@ -137,23 +145,59 @@ export struct HomeSearchPage {
 
   @Builder
   ListView(_scroller: Scroller) {
-    List({ scroller: _scroller, space: 12 }) {
+    List({ scroller: _scroller }) {
       LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           CommonArticleItem({
-            item: item
+            item: item,
+            onArticleAuthorClick: (isAuthor: boolean) => {
+              if (isAuthor) {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, item.title,item.author)
+              } else {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId, item.title)
+              }
+            },
+            onArticleCollect: (isCollected: boolean) => {
+              if (isCollected) {
+                this.handleCollectArticle(item, index, false)
+              } else {
+                this.handleCollectArticle(item, index, true)
+              }
+            }
           })
+            .margin({ top: index == 0 ? 16 : 8, bottom: 8 })
         }.margin({ left: 20, right: 20 })
         .onClick(() => {
           WebViewPage.startPage(item.link, true, item.title)
         })
-      }, (item: CommonArticlesBean) => item.id + '')
+      }, (item: CommonArticlesBean) => item.id + '-'+item.collect)
     }
     .width('100%')
     .margin({ bottom: 20, top: 15 })
     .backgroundColor('#f5f5f5')
     .layoutWeight(1)
     .cachedCount(4)
+  }
+
+  private handleCollectArticle(item: CommonArticlesBean, index: number, isCollect: boolean) {
+    mSearchViewModel.showLoading()
+    FeatureUtils.getInstance().handleCollectArticle(item.id, isCollect)
+      .then((data: ResponseResultC<''>) => {
+        mSearchViewModel.hideLoading()
+        if (data.errorCode === 0) {
+          ToastUtil.showToast(isCollect ? '收藏成功' : '取消收藏成功')
+          let updateItem = new CommonArticlesBean()
+          updateItem = item
+          updateItem.collect = isCollect
+          this.dataList.changeData(index, updateItem)
+        } else {
+          ToastUtil.showToast(isCollect ? '收藏失败' : '取消收藏失败')
+        }
+      })
+      .catch((msg: string) => {
+        mSearchViewModel.hideLoading()
+        ToastUtil.showToast(msg)
+      })
   }
 
   @Builder

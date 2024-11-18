@@ -11,6 +11,7 @@ import { CoinInfo, CommonUserArticlesBean } from "../model/CommonUserArticlesBea
 import { CommonViewModel } from "../viewmodel/CommonViewModel"
 import { WebViewPage } from "./WebViewPage"
 import { CommonPagingBean } from "../model/CommonPagingBean"
+import { FeatureUtils } from "../FeatureUtils"
 
 export enum ArticleFromType {
   ArticleByOther = 1,
@@ -34,6 +35,7 @@ export struct CommonShareArticlePage {
   @State msgError: string = '数据异常'
   @State userId: number = 0
   @State userTitle: string = ''
+  @State authorName: string = ''
   @State articleFromType: ArticleFromType = ArticleFromType.ArticleByOther
   @State userCoinInfo: CoinInfo = new CoinInfo()
   @State totalArticles: number = 0
@@ -46,11 +48,12 @@ export struct CommonShareArticlePage {
   @State tempIsAllLoadOver: boolean = false
   @State inputContent: string = ''
 
-  static startPage(fromType: ArticleFromType, userId: number, title: string) {
+  static startPage(fromType: ArticleFromType, userId: number, title: string, authorName?: string) {
     RouterUtil.pushNamedRoute('CommonShareArticlePage', {
       "articleFromType": fromType,
       "userId": userId,
-      "title": title
+      "title": title,
+      "authorName": authorName ? authorName : ''
     })
   }
 
@@ -60,24 +63,38 @@ export struct CommonShareArticlePage {
       this.userId = params.userId as number
       this.userTitle = params.title as string
       this.articleFromType = params.articleFromType as ArticleFromType
+      this.authorName = params.authorName as string
     }
     this.getRequestByFromType()
   }
 
   private getRequestByFromType() {
     if (this.articleFromType == ArticleFromType.ArticleByOther) {
+      //分享人分享的文章列表
+      //页面从1开始
+      //显示分享人的基本数据信息
+      this.pageIndex = 1
       this.isShowUserInfo = true
       this.getShareArticleList()
     } else if (this.articleFromType == ArticleFromType.ArticleByAuthor) {
-
+      //作者的文章列表（按作者名称搜索）
+      //页面从0开始
+      //不显示作者的基本信息
+      this.pageIndex = 0
+      this.getArticleListByAuthorName()
     } else if (this.articleFromType == ArticleFromType.ArticleBySelf) {
 
     } else if (this.articleFromType == ArticleFromType.ArticleByOfficialAccount) {
+      //公众号对应文章列表
+      //页面从1开始
+      //不显示公众号的基本信息
+      //显示在本公众号列表搜索
+      this.pageIndex = 1
       this.isShowUserInfo = false
       this.isShowSearchIcon = true
       this.getOfficialAccountArticleList()
     } else if (this.articleFromType == ArticleFromType.ArticleBySearch) {
-      this.getArticleSearch()
+      this.getWxArticleSearch()
     }
   }
 
@@ -105,7 +122,7 @@ export struct CommonShareArticlePage {
               if (value === '') {
                 this.articleFromType = ArticleFromType.ArticleByOfficialAccount
                 this.dataList.clear()
-                this.tempDataList.dataArray.forEach((value:CommonArticlesBean)=>{
+                this.tempDataList.dataArray.forEach((value: CommonArticlesBean) => {
                   this.dataList.pushData(value)
                 })
                 this.pageIndex = this.tempPageIndex
@@ -119,7 +136,7 @@ export struct CommonShareArticlePage {
                 return
               }
               this.articleFromType = ArticleFromType.ArticleBySearch
-              this.dataList.dataArray.forEach((value:CommonArticlesBean)=>{
+              this.dataList.dataArray.forEach((value: CommonArticlesBean) => {
                 this.tempDataList.pushData(value)
               })
               this.tempPageIndex = this.pageIndex
@@ -256,7 +273,7 @@ export struct CommonShareArticlePage {
       })
   }
 
-  private getArticleSearch() {
+  private getWxArticleSearch() {
     this.mCommonViewModel.getSearchWxArticlesList(this.userId, this.pageIndex, this.inputContent)
       .then((data: CommonPagingBean<CommonArticlesBean>) => {
         this.isAllLoadOver = data.over
@@ -282,13 +299,46 @@ export struct CommonShareArticlePage {
       })
   }
 
+  private getArticleListByAuthorName() {
+    this.mCommonViewModel.getArticlesListByAuthorName(this.pageIndex, this.authorName)
+      .then((data: CommonPagingBean<CommonArticlesBean>) => {
+        this.isAllLoadOver = data.over
+        this.refreshStatus = HeaderRefreshStatus.inactive
+        this.loadMoreStatus = FooterLoadMoreStatus.inactive
+        if (data.total > 0) {
+          this.pageState = DefaultStateEnum.NORMAL
+        } else {
+          this.pageState = DefaultStateEnum.EMPTY
+        }
+        if (data.curPage == 1) {
+          this.pageIndex = 0
+          this.dataList.clear()
+        }
+        this.pageIndex++
+        this.dataList.appendArrayData(data.datas)
+      })
+      .catch((msg: string) => {
+        this.msgError = msg
+        this.pageState = DefaultStateEnum.ERROR
+        this.refreshStatus = HeaderRefreshStatus.inactive
+        this.loadMoreStatus = FooterLoadMoreStatus.inactive
+      })
+  }
+
   @Builder
   ContentListView(scroller: Scroller) {
     List({ scroller: scroller }) {
       LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           CommonArticleItem({
-            item: item
+            item: item,
+            onArticleCollect: (isCollected: boolean) => {
+              if (isCollected) {
+                this.handleCollectArticle(item, index, false)
+              } else {
+                this.handleCollectArticle(item, index, true)
+              }
+            }
           })
             .margin({
               left: 15,
@@ -301,9 +351,30 @@ export struct CommonShareArticlePage {
             })
         }
 
-      }, (item: CommonArticlesBean) => item.id)
+      }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
     }.width('100%')
     .layoutWeight(1)
-    .cachedCount(3)
+    .cachedCount(4)
+  }
+
+  private handleCollectArticle(item: CommonArticlesBean, index: number, isCollect: boolean) {
+    this.mCommonViewModel.showLoading()
+    FeatureUtils.getInstance().handleCollectArticle(item.id, isCollect)
+      .then((data: ResponseResultC<''>) => {
+        this.mCommonViewModel.hideLoading()
+        if (data.errorCode === 0) {
+          ToastUtil.showToast(isCollect ? '收藏成功' : '取消收藏成功')
+          let updateItem = new CommonArticlesBean()
+          updateItem = item
+          updateItem.collect = isCollect
+          this.dataList.changeData(index, updateItem)
+        } else {
+          ToastUtil.showToast(isCollect ? '收藏失败' : '取消收藏失败')
+        }
+      })
+      .catch((msg: string) => {
+        this.mCommonViewModel.hideLoading()
+        ToastUtil.showToast(msg)
+      })
   }
 }

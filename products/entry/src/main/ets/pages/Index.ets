@@ -75,7 +75,7 @@ struct Index {
         }) {
           Tabs({ index: this.currentIndex }) {
             TabContent() {
-              // HomePage()
+              HomePage()
             }
 
             TabContent() {

@@ -18,7 +18,6 @@ export struct HotProjectListPage {
   @State dataList: LazyDataSource<CommonArticlesBean> = new LazyDataSource()
   @State cid: string = ''
   @State msgError: string = '数据异常'
-  @State itemDataBean: CommonArticlesBean = new CommonArticlesBean()
 
   aboutToAppear(): void {
     this.getProjectList()
@@ -81,25 +80,19 @@ export struct HotProjectListPage {
       })
   }
 
-  private handleCollectArticle(item: CommonArticlesBean, index: number) {
+  private handleCollectArticle(item: CommonArticlesBean, index: number, isCollect: boolean) {
     mProjectsViewModel.showLoading()
-    FeatureUtils.getInstance().handleCollectArticle(item.id)
+    FeatureUtils.getInstance().handleCollectArticle(item.id, isCollect)
       .then((data: ResponseResultC<''>) => {
         mProjectsViewModel.hideLoading()
         if (data.errorCode === 0) {
-          ToastUtil.showToast('收藏成功')
-          let temp: ObservedArray<CommonArticlesBean> =[]
-
-          this.dataList.dataArray.forEach((value: CommonArticlesBean) => {
-            if (value.id === item.id) {
-              value.collect = true
-            }
-            temp.push(value)
-          })
-
-          this.dataList.pushArrayData(temp)
+          ToastUtil.showToast(isCollect ? '收藏成功' : '取消收藏成功')
+          let updateItem = new CommonArticlesBean()
+          updateItem=item
+          updateItem.collect = isCollect
+          this.dataList.changeData(index, updateItem)
         } else {
-          ToastUtil.showToast('收藏失败')
+          ToastUtil.showToast(isCollect ? '收藏失败' : '取消收藏失败')
         }
       })
       .catch((msg: string) => {
@@ -112,13 +105,16 @@ export struct HotProjectListPage {
   ContentListView(scroller: Scroller) {
     List({ scroller: scroller }) {
       LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
-        ListItem(){
+        ListItem() {
           ProjectItemView({
             item: item,
             onCollectClick: () => {
-              if (!item.collect) {
-                this.itemDataBean = item
-                this.handleCollectArticle(item, index)
+              if (item.collect) {
+                //取消收藏
+                this.handleCollectArticle(item, index,false)
+              } else {
+                //收藏
+                this.handleCollectArticle(item, index,true)
               }
             }
           })
@@ -143,7 +139,7 @@ export struct HotProjectListPage {
               }
             ])
         }
-      }, (item: CommonArticlesBean) => item.id)
+      }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
     }.width('100%')
     .layoutWeight(1)
     .cachedCount(3)
@@ -152,7 +148,7 @@ export struct HotProjectListPage {
 
 @Component
 struct ProjectItemView {
-  @State item: CommonArticlesBean = new CommonArticlesBean()
+  @ObjectLink item: CommonArticlesBean
   onCollectClick?: () => void
 
   build() {

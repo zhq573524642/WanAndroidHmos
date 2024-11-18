@@ -5,6 +5,7 @@ import {
   CommonArticlesBean,
   CommonPagingBean,
   CommonShareArticlePage,
+  FeatureUtils,
   PageTitleComponent
 } from "lib_components";
 import mHomeViewModel from "../viewmodel/HomeViewModel";
@@ -16,6 +17,7 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
 import { HomeSearchPage } from "./HomeSearchPage";
+import { ResponseResultC } from "utils";
 
 
 @Component
@@ -140,23 +142,53 @@ export struct HomePage {
           CommonArticleItem({
             item: item,
             onArticleAuthorClick: (isAuthor: boolean) => {
-                if (isAuthor) {
-                  CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author)
-                } else {
-                  CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId,
-                    '分享人:' + item.shareUser)
-                }
+              if (isAuthor) {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author,item.author)
+              } else {
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId,
+                  '分享人:' + item.shareUser)
+              }
+            },
+            onArticleCollect: (isCollect: boolean) => {
+              if (isCollect) {
+                //取消收藏
+                this.handleCollectArticle(item, index, false)
+              } else {
+                //收藏
+                this.handleCollectArticle(item, index, true)
+              }
             }
           })
             .onClick(() => {
               WebViewPage.startPage(item.link, true, item.title)
             })
         }.margin({ left: 20, right: 20 })
-      })
+      }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
     }.width('100%')
     .layoutWeight(1)
     .cachedCount(4)
     .margin({ top: 15, bottom: 20 })
+  }
+
+  private handleCollectArticle(item: CommonArticlesBean, index: number, isCollect: boolean) {
+    mHomeViewModel.showLoading()
+    FeatureUtils.getInstance().handleCollectArticle(item.id, isCollect)
+      .then((data: ResponseResultC<''>) => {
+        mHomeViewModel.hideLoading()
+        if (data.errorCode === 0) {
+          ToastUtil.showToast(isCollect ? '收藏成功' : '取消收藏成功')
+          let updateItem = new CommonArticlesBean()
+          updateItem = item
+          updateItem.collect = isCollect
+          this.homeArticleList.changeData(index, updateItem)
+        } else {
+          ToastUtil.showToast(isCollect ? '收藏失败' : '取消收藏失败')
+        }
+      })
+      .catch((msg: string) => {
+        mHomeViewModel.hideLoading()
+        ToastUtil.showToast(msg)
+      })
   }
 
   //获取banner数据

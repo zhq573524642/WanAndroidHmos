@@ -1,4 +1,4 @@
-import { RouterUtil, ToastUtil } from "utils";
+import { ResponseResultC, RouterUtil, ToastUtil } from "utils";
 import { router } from "@kit.ArkUI";
 import { BasePage } from "commons";
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum";
@@ -7,6 +7,7 @@ import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
 import { CommonArticleItem, CommonArticlesBean, CommonPagingBean, FeatureUtils } from "lib_components";
 import mSystemsViewModel from "../viewmodel/SystemsViewModel";
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
+import { it } from "@ohos/hypium";
 
 @Entry({ routeName: 'SystemsSearchPage' })
 @Component
@@ -113,6 +114,9 @@ export struct SystemsSearchPage {
         ListItem() {
           CommonArticleItem({
             item: item,
+            onArticleCollect: (isCollected: boolean) => {
+              this.handleCollectArticle(item, index, !isCollected)
+            }
           })
         }
         .margin({
@@ -124,9 +128,30 @@ export struct SystemsSearchPage {
         .onClick(() => {
           WebViewPage.startPage(item.link, true, item.title)
         })
-      }, (item: CommonArticlesBean) => item.id + '')
+      }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
     }.width('100%')
     .layoutWeight(1)
     .cachedCount(4)
+  }
+
+  private handleCollectArticle(item: CommonArticlesBean, index: number, isCollect: boolean) {
+    mSystemsViewModel.showLoading()
+    FeatureUtils.getInstance().handleCollectArticle(item.id, isCollect)
+      .then((data: ResponseResultC<''>) => {
+        mSystemsViewModel.hideLoading()
+        if (data.errorCode === 0) {
+          ToastUtil.showToast(isCollect ? '收藏成功' : '取消收藏成功')
+          let updateItem = new CommonArticlesBean()
+          updateItem = item
+          updateItem.collect = isCollect
+          this.dataList.changeData(index, updateItem)
+        } else {
+          ToastUtil.showToast(isCollect ? '收藏失败' : '取消收藏失败')
+        }
+      })
+      .catch((msg: string) => {
+        mSystemsViewModel.hideLoading()
+        ToastUtil.showToast(msg)
+      })
   }
 }

@@ -4,7 +4,7 @@ import { CommonArticlesBean } from "../model/CommonArticlesBean"
 import { CommonPagingBean } from "../model/CommonPagingBean"
 import { CommonUserArticlesBean } from "../model/CommonUserArticlesBean"
 
-export class CommonViewModel extends BaseViewModel{
+export class CommonViewModel extends BaseViewModel {
   static instance: CommonViewModel
 
   public static getInstance(): CommonViewModel {
@@ -54,11 +54,12 @@ export class CommonViewModel extends BaseViewModel{
   }
 
   //公众号搜索某个作者的某个关键字的文章
-  getSearchWxArticlesList(userId: number, pageIndex: number,key:string): Promise<CommonPagingBean<CommonArticlesBean>> {
-     this.showMsgLoading('搜索中..')
+  getSearchWxArticlesList(userId: number, pageIndex: number,
+    key: string): Promise<CommonPagingBean<CommonArticlesBean>> {
+    this.showMsgLoading('搜索中..')
     return new Promise<CommonPagingBean<CommonArticlesBean>>(async (resolve, reject) => {
       httpARequestGet<ResponseResultC<CommonPagingBean<CommonArticlesBean>>>(
-        'wxarticle/list/'+userId+'/'+pageIndex+'/json?k='+key
+        'wxarticle/list/' + userId + '/' + pageIndex + '/json?k=' + key
       )
         .then((data: ResponseResultC<CommonPagingBean<CommonArticlesBean>>) => {
           this.hideLoading()
@@ -75,4 +76,24 @@ export class CommonViewModel extends BaseViewModel{
     })
   }
 
+  getArticlesListByAuthorName(pageIndex: number, authorName: string): Promise<CommonPagingBean<CommonArticlesBean>> {
+    this.showMsgLoading('搜索中..')
+    return new Promise<CommonPagingBean<CommonArticlesBean>>(async (resolve, reject) => {
+      httpARequestGet<ResponseResultC<CommonPagingBean<CommonArticlesBean>>>(
+        'article/list/' + pageIndex + '/json?author=' + authorName
+      )
+        .then((data: ResponseResultC<CommonPagingBean<CommonArticlesBean>>) => {
+          this.hideLoading()
+          if (data.errorCode === 0) {
+            resolve(data.data)
+          } else {
+            reject(data.errorMsg)
+          }
+        })
+        .catch((error: string) => {
+          this.hideLoading()
+          reject(error)
+        })
+    })
+  }
 }
