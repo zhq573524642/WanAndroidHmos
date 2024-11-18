@@ -56,16 +56,52 @@ export struct TodoListComponent {
         if (data.errorCode === 0) {
           ToastUtil.showCenterToast('修改成功')
           this.updateTodoDialogController.close()
-          // this.todoList.dataArray.forEach((value: TodoList) => {
-          //   if (value.id === this.updateTodoId) {
-          //     value.title = title
-          //     value.content = desc
-          //     value.dateStr = date
-          //     value.type = type
-          //     value.priority = priority
-          //   }
-          // })
-          // this.todoList.notifyDataReload()
+          let updateItem = new TodoList()
+          updateItem.id = this.updateTodoId
+          updateItem.title = title
+          updateItem.content = desc
+          updateItem.dateStr = date
+          updateItem.type = type
+          updateItem.priority = priority
+          this.todoList.changeData(this.updateTodoIndex, updateItem)
+        }
+      })
+      .catch((msg: string) => {
+        ToastUtil.showCenterToast(msg)
+      })
+  }
+
+  private deleteTodo(id: string, index: number) {
+    mTodoViewModel.deleteTodo(id)
+      .then((data: ResponseResultC<''>) => {
+        if (data.errorCode === 0) {
+          ToastUtil.showCenterToast('删除成功')
+          this.todoList.deleteData(index)
+          this.todoList.reloadData()
+          if (this.todoList.isEmpty()) {
+            this.pageState = DefaultStateEnum.EMPTY
+          }
+        } else {
+          ToastUtil.showCenterToast('删除失败')
+        }
+      })
+      .catch((msg: string) => {
+        ToastUtil.showCenterToast(msg)
+      })
+  }
+
+  private doneTodo(id: string, index: number, doneStatus: number) {
+    mTodoViewModel.doneTodo(id, doneStatus)
+      .then((data: ResponseResultC<''>) => {
+        if (data.errorCode === 0) {
+          ToastUtil.showCenterToast('已完成')
+          this.todoList.deleteData(index)
+          this.todoList.reloadData()
+          if (this.todoList.isEmpty()) {
+            this.pageState = DefaultStateEnum.EMPTY
+          }
+        } else {
+          ToastUtil.showCenterToast('操作完成失败')
         }
       })
       .catch((msg: string) => {
@@ -124,7 +160,10 @@ export struct TodoListComponent {
         ListItem() {
           TodoItemView({
             item: item,
-            status: this.status
+            status: this.status,
+            onHandleTodoClick: () => {
+              this.doneTodo(item.id, index, this.status == 0 ? 1 : 0)
+            }
           })
         }
         .margin({
@@ -140,7 +179,7 @@ export struct TodoListComponent {
             }
           }
         })
-      }, (item: TodoList) => item.id)
+      }, (item: TodoList) => JSON.stringify(item))
     }.cachedCount(4)
   }
 
@@ -172,7 +211,8 @@ export struct TodoListComponent {
           .width(25)
           .height(25)
           .objectFit(ImageFit.Cover)
-      }.backgroundColor(Color.Red)
+      }
+      .backgroundColor(Color.Red)
       .width(80)
       .height(80)
       .borderRadius({
@@ -180,6 +220,10 @@ export struct TodoListComponent {
         topRight: 10,
         bottomLeft: 0,
         bottomRight: 10
+      })
+      .onClick(() => {
+        this.updateTodoIndex = index
+        this.deleteTodo(item.id, index)
       })
     }.width(160)
     .height(80)
@@ -214,8 +258,9 @@ export struct TodoListComponent {
 
 @Component
 struct TodoItemView {
-  item: TodoList = new TodoList()
+  @ObjectLink item: TodoList
   status: number = 0
+  onHandleTodoClick?: () => void
 
   build() {
     Stack({ alignContent: Alignment.End }) {
@@ -224,6 +269,10 @@ struct TodoItemView {
           .width(28)
           .height(28)
           .objectFit(ImageFit.Fill)
+          .onClick(() => {
+            this.onHandleTodoClick?.()
+          })
+
         Column() {
           Text(this.item.title).fontColor(Color.Black).fontSize(15)
             .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })

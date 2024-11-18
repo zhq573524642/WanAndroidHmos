@@ -10,4 +10,6 @@ export class MineApi {
   static readonly API_TODO_LIST: string = 'lg/todo/v2/list/'
   static readonly API_TODO_CREATE: string = 'lg/todo/add/json'
   static readonly API_TODO_UPDATE: string = 'lg/todo/update/'
+  static readonly API_TODO_DELETE: string = 'lg/todo/delete/'
+  static readonly API_TODO_DONE: string = 'lg/todo/done/'
 }

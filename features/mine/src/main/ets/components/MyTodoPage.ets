@@ -33,17 +33,17 @@ export struct MyTodoPage {
 
   private requestCreateTodo(title: string, desc: string, date: string,
     type: number, priority: number) {
-  mTodoViewModel.createTodo(title,desc,date,type,priority)
-    .then((data:ResponseResultC<''>)=>{
-      if (data.errorCode === 0) {
-        ToastUtil.showCenterToast('创建成功')
-        this.createTodoDialogController.close()
-        EmitterUtils.getInstance().post(AppConstant.FLAG_CREATE_TODO)
-      }
-    })
-    .catch((msg:string)=>{
-      ToastUtil.showCenterToast(msg)
-    })
+    mTodoViewModel.createTodo(title, desc, date, type, priority)
+      .then((data: ResponseResultC<''>) => {
+        if (data.errorCode === 0) {
+          ToastUtil.showCenterToast('创建成功')
+          this.createTodoDialogController.close()
+          EmitterUtils.getInstance().post(AppConstant.FLAG_CREATE_TODO)
+        }
+      })
+      .catch((msg: string) => {
+        ToastUtil.showCenterToast(msg)
+      })
   }
 
   build() {
@@ -75,6 +75,7 @@ export struct MyTodoPage {
           this.currentTabIndex = index
         })
         .onChange((index: number) => {
+          EmitterUtils.getInstance().post(AppConstant.FLAG_CREATE_TODO)
           this.currentTabIndex = index
         })
 

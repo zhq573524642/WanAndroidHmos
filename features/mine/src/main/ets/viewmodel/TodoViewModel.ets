@@ -92,6 +92,48 @@ class TodoViewModel extends BaseViewModel {
         })
     })
   }
+
+  deleteTodo(id: string): Promise<ResponseResultC<''>> {
+    this.showLoading()
+    return new Promise<ResponseResultC<''>>(async (resolve, reject) => {
+
+      httpFormRequestPost<ResponseResultC<''>>(MineApi.API_TODO_DELETE + id + '/json', {})
+        .then((data: ResponseResultC<''>) => {
+          this.hideLoading()
+          if (data.errorCode === 0) {
+            resolve(data)
+          } else {
+            reject(data.errorMsg)
+          }
+        })
+        .catch((error: string) => {
+          this.hideLoading()
+          reject(error)
+        })
+    })
+  }
+
+  doneTodo(id: string, status: number): Promise<ResponseResultC<''>> {
+    this.showLoading()
+    return new Promise<ResponseResultC<''>>(async (resolve, reject) => {
+      let param: Record<string, Object> = {
+        "status": status
+      }
+      httpFormRequestPost<ResponseResultC<''>>(MineApi.API_TODO_DONE + id + '/json', param)
+        .then((data: ResponseResultC<''>) => {
+          this.hideLoading()
+          if (data.errorCode === 0) {
+            resolve(data)
+          } else {
+            reject(data.errorMsg)
+          }
+        })
+        .catch((error: string) => {
+          this.hideLoading()
+          reject(error)
+        })
+    })
+  }
 }
 
 let mTodoViewModel = new TodoViewModel()
