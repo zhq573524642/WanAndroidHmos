@@ -5,6 +5,23 @@ import { BannerData } from '../model/BannerData';
 import { CommonArticlesBean, CommonPagingBean } from 'lib_components';
 
 class HomeViewModel extends BaseViewModel {
+  //获取未读消息数量
+  getUnreadMsgCount(): Promise<number> {
+    return new Promise<number>(async (resolve, reject) => {
+      httpARequestGet<ResponseResultC<number>>(HomeApi.API_UNREAD_MSG_COUNT)
+        .then((data: ResponseResultC<number>) => {
+          if (data.errorCode === 0) {
+            resolve(data.data)
+          } else {
+            reject(data.errorMsg)
+          }
+        })
+        .catch((error: string) => {
+          reject(error)
+        })
+    })
+  }
+
   //获取首页Banner
   getHomeBannerData(): Promise<Array<BannerData>> {
     return new Promise<Array<BannerData>>(async (resolve: Function, reject: Function) => {

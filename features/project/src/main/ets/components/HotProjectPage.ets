@@ -7,6 +7,7 @@ import { SystemsPage } from "./SystemsPage"
 
 @Component
 export struct HotProjectPage {
+  @Consume('ProjectPathStack') projectPathStack: NavPathStack
   @State projectTypeList: Array<ProjectTypeBean> = []
   @State tabsIndex: number = 0
   @State tabItemData: ProjectTypeBean = new ProjectTypeBean()
@@ -16,35 +17,43 @@ export struct HotProjectPage {
   }
 
   build() {
-    Column() {
-      PageTitleComponent({
-        title: '热门项目',
-        isShowRightIcons: true,
-        rightIcons: [$r('app.media.ic_systems_icon')],
-        onRightIconClick: (icon: ResourceStr, index: number) => {
-          SystemsPage.startPage()
+    Navigation(this.projectPathStack) {
+      Column() {
+        PageTitleComponent({
+          title: '热门项目',
+          isShowRightIcons: true,
+          rightIcons: [$r('app.media.ic_systems_icon'), $r('app.media.ic_course')],
+          onRightIconClick: (icon: ResourceStr, index: number) => {
+            if (index == 0) {
+              SystemsPage.startPage()
+            } else {
+              this.projectPathStack.pushPathByName('CoursePage', '', true)
+            }
+          }
+        })
+        Tabs({ index: this.tabsIndex }) {
+          ForEach(this.projectTypeList, (tabItem: ProjectTypeBean, index: number) => {
+            TabContent() {
+              HotProjectListPage({
+                cid: tabItem.id
+              })
+            }.tabBar(this.TabsView(tabItem))
+          }, (item: ProjectTypeBean) => item.id)
         }
-      })
-      Tabs({ index: this.tabsIndex }) {
-        ForEach(this.projectTypeList, (tabItem: ProjectTypeBean, index: number) => {
-          TabContent() {
-            HotProjectListPage({
-              cid: tabItem.id
-            })
-          }.tabBar(this.TabsView(tabItem))
-        }, (item: ProjectTypeBean) => item.id)
-      }
-      .barMode(BarMode.Scrollable)
-      .layoutWeight(1)
-      .width('100%')
-      .scrollable(true)
-      .vertical(false)
-      .onChange((i: number) => {
-        this.tabItemData = this.projectTypeList[i]
-      })
-    }.width('100%')
-    .height('100%')
-    .backgroundColor(Color.White)
+        .barMode(BarMode.Scrollable)
+        .layoutWeight(1)
+        .width('100%')
+        .scrollable(true)
+        .vertical(false)
+        .onChange((i: number) => {
+          this.tabItemData = this.projectTypeList[i]
+        })
+      }.width('100%')
+      .height('100%')
+      .backgroundColor(Color.White)
+    }.hideTitleBar(true)
+    .hideToolBar(true)
+    .mode(NavigationMode.Stack)
   }
 
   private getProjectsType() {

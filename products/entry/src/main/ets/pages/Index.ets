@@ -18,6 +18,7 @@ struct Index {
   @StorageLink('currentBreakpoint') currentBreakpoint: string = BreakpointTypeEnum.MD;
   @Provide('appPathStack') appPathStack: NavPathStack = new NavPathStack();
   @Provide('homePathStack') homePathStack: NavPathStack = new NavPathStack()
+  @Provide('ProjectPathStack') projectPathStack: NavPathStack = new NavPathStack()
   @Provide('minePathStack') minePathStack: NavPathStack = new NavPathStack()
   @Provide('questionsPathStack') questionsPathStack: NavPathStack = new NavPathStack()
   @State currentIndex: TabBarType = TabBarType.HOME

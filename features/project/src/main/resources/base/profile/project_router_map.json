@@ -1,0 +1,14 @@
+{
+  "routerMap": [
+    {
+      "name": "CoursePage",
+      "pageSourceFile": "src/main/ets/components/CoursePage.ets",
+      "buildFunction": "CoursePageBuilder"
+    },
+    {
+      "name": "CourseDetailPage",
+      "pageSourceFile": "src/main/ets/components/CourseDetailPage.ets",
+      "buildFunction": "CourseDetailPageBuilder"
+    }
+  ]
+}

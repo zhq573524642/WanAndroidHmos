@@ -12,4 +12,6 @@ export class MineApi {
   static readonly API_TODO_UPDATE: string = 'lg/todo/update/'
   static readonly API_TODO_DELETE: string = 'lg/todo/delete/'
   static readonly API_TODO_DONE: string = 'lg/todo/done/'
+  static readonly API_COLLECT_OUTER_ARTICLE = 'lg/collect/add/json';//收藏站外文章
+  static readonly API_EDIT_COLLECT_ARTICLE:string='lg/collect/user_article/update/'
 }

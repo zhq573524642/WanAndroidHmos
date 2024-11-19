@@ -29,6 +29,11 @@ export struct PageTitleComponent {
       Text(this.title)
         .fontSize(this.titleFontSize)
         .fontColor(Color.Black)
+        .minFontSize(15)
+        .maxFontSize(30)
+        .maxLines(2)
+        .textOverflow({overflow:TextOverflow.Ellipsis})
+        .ellipsisMode(EllipsisMode.END)
         .fontWeight(FontWeight.Bold)
         .margin({ top: 15, bottom: 15 })
       Blank().layoutWeight(1)
@@ -50,9 +55,9 @@ export struct PageTitleComponent {
         if (this.isShowRightIcons) {
           ForEach(this.rightIcons, (value: ResourceStr, index: number) => {
             Image(value)
-              .width(28)
+              .width(25)
               .objectFit(ImageFit.Cover)
-              .height(28)
+              .height(25)
               .margin({ left: 12 })
               .onClick(() => {
                 this.onRightIconClick?.(value,index)

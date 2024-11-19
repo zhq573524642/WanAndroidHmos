@@ -8,7 +8,8 @@ class CollectViewModel extends BaseViewModel {
   getCollectionsList(pageIndex: number): Promise<CommonPagingBean<CommonArticlesBean>> {
     return new Promise<CommonPagingBean<CommonArticlesBean>>(async (resolve, reject) => {
 
-      httpARequestGet<ResponseResultC<CommonPagingBean<CommonArticlesBean>>>(MineApi.API_COLLECTIONS + pageIndex + '/json')
+      httpARequestGet<ResponseResultC<CommonPagingBean<CommonArticlesBean>>>(MineApi.API_COLLECTIONS + pageIndex +
+        '/json')
         .then((data: ResponseResultC<CommonPagingBean<CommonArticlesBean>>) => {
           if (data.errorCode === 0) {
             resolve(data.data)
@@ -33,6 +34,56 @@ class CollectViewModel extends BaseViewModel {
           this.hideLoading()
           if (data.errorCode === 0) {
             resolve(data)
+          } else {
+            reject(data.errorMsg)
+          }
+        })
+        .catch((error: string) => {
+          this.hideLoading()
+          reject(error)
+        })
+    })
+  }
+
+  //收藏站外文章
+  collectOuterArticle(title: string, author: string, link: string): Promise<string> {
+    this.showLoading()
+    return new Promise<string>(async (resolve, reject) => {
+      let param: Record<string, Object> = {
+        "title": title,
+        "author": author,
+        "link": link
+      }
+      httpFormRequestPost<ResponseResultC<string>>(MineApi.API_COLLECT_OUTER_ARTICLE, param)
+        .then((data: ResponseResultC<string>) => {
+          this.hideLoading()
+          if (data.errorCode === 0) {
+            resolve('收藏成功')
+          } else {
+            reject(data.errorMsg)
+          }
+        })
+        .catch((error: string) => {
+          this.hideLoading()
+          reject(error)
+        })
+    })
+  }
+
+  //编辑收藏的文章
+  updateCollectArticle(id: string, title: string, author: string, link: string): Promise<string> {
+    this.showLoading()
+    return new Promise<string>(async (resolve, reject) => {
+      let param: Record<string, Object> = {
+        "title": title,
+        "author": author,
+        "link": link
+      }
+      httpFormRequestPost<ResponseResultC<string>>(MineApi.API_EDIT_COLLECT_ARTICLE + id + '/json', param)
+        .then((data: ResponseResultC<string>) => {
+          this.hideLoading()
+          if (data.errorCode === 0) {
+            resolve('修改成功')
           } else {
             reject(data.errorMsg)
           }

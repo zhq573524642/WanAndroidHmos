@@ -21,6 +21,10 @@ export struct SystemsPage {
     RouterUtil.pushNamedRoute('SystemsPage')
   }
 
+  static startPageIndex(){
+    RouterUtil.pushNamedRoute('SystemsPage')
+  }
+
   aboutToAppear(): void {
     this.getSystemsListData()
   }

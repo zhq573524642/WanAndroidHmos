@@ -6,5 +6,7 @@ export class HomeApi {
   static readonly API_WELCOME_COLUMN: string = 'popular/column/json'
   static readonly API_SEARCH_HOT_WORD: string = 'hotkey/json'
   static readonly API_WEB_SITE: string = 'friend/json'
-  static readonly API_HOME_SEARCH:string='article/query/'
+  static readonly API_HOME_SEARCH: string = 'article/query/'
+  static readonly API_UNREAD_MSG_COUNT: string = 'message/lg/count_unread/json'
+  static readonly API_MSG_UNREAD_LIST:string='message/lg/unread_list/'
 }

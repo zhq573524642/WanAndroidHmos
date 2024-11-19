@@ -17,7 +17,7 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
 import { HomeSearchPage } from "./HomeSearchPage";
-import { ResponseResultC } from "utils";
+import { ResponseResultC, RouterUtil } from "utils";
 
 
 @Component
@@ -34,11 +34,49 @@ export struct HomePage {
   @State tabLearnList: Array<CommonArticlesBean> = []
   @State tabQuestionList: Array<CommonArticlesBean> = []
   @State tabColumnList: Array<CommonArticlesBean> = []
+  @State unreadMessageCount: number = 0
 
   aboutToAppear(): void {
+    this.getUnreadMsgCount()
     this.getHomeBannerData()
     this.getHomeArticleList()
     this.getHomeWelComeTabData()
+  }
+
+  @Builder
+  MessageView() {
+    Row() {
+      Image($r('app.media.ic_search'))
+        .width(25)
+        .height(25)
+        .objectFit(ImageFit.Cover)
+        .onClick(() => {
+          HomeSearchPage.startPage()
+        })
+      Stack({ alignContent: Alignment.Center }) {
+        Image($r('app.media.ic_home_message'))
+          .width(25)
+          .height(25)
+          .objectFit(ImageFit.Cover)
+        if (this.unreadMessageCount > 0) {
+          Stack({ alignContent: Alignment.TopEnd }) {
+            Text(this.unreadMessageCount > 99 ? '99+' : this.unreadMessageCount + '')
+              .fontColor(Color.White)
+              .width(16)
+              .height(16)
+              .fontSize(9)
+              .margin({ bottom: 13, left: 13 })
+              .textAlign(TextAlign.Center)
+              .backgroundColor(Color.Red)
+              .borderRadius(20)
+          }
+        }
+      }.margin({ left: 12 })
+      .onClick(() => {
+        this.homePathStack.pushPathByName("MessagesPage", '', true)
+      })
+    }
+
   }
 
   build() {
@@ -46,10 +84,8 @@ export struct HomePage {
       Column() {
         PageTitleComponent({
           title: '首页',
-          isShowRightIcons: true,
-          rightIcons: [$r('app.media.ic_search')],
-          onRightIconClick: (icon: ResourceStr, index: number) => {
-            HomeSearchPage.startPage()
+          onCustomRightView: () => {
+            this.MessageView()
           }
         })
         BasePage({
@@ -143,7 +179,8 @@ export struct HomePage {
             item: item,
             onArticleAuthorClick: (isAuthor: boolean) => {
               if (isAuthor) {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author,item.author)
+                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author,
+                  item.author)
               } else {
                 CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId,
                   '分享人:' + item.shareUser)
@@ -188,6 +225,13 @@ export struct HomePage {
       .catch((msg: string) => {
         mHomeViewModel.hideLoading()
         ToastUtil.showToast(msg)
+      })
+  }
+
+  private getUnreadMsgCount() {
+    mHomeViewModel.getUnreadMsgCount()
+      .then((data: number) => {
+        this.unreadMessageCount = data
       })
   }
 
@@ -301,6 +345,15 @@ export struct WelcomeTabItem {
           .maxLines(2)
           .textAlign(TextAlign.Start)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .onClick(()=>{
+            if (this.type==1) {
+
+            }else if (this.type==2){
+              WebViewPage.startPage(item.link,true,item.title)
+            }else {
+              RouterUtil.pushNamedRoute('SystemsPage')
+            }
+          })
       }, (item: CommonArticlesBean) => item.id + '')
     }
     .layoutWeight(1)

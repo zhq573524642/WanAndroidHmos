@@ -2,6 +2,7 @@
   "module": {
     "name": "project",
     "type": "har",
+    "routerMap": "$profile:project_router_map",
     "deviceTypes": [
       "default",
       "tablet",

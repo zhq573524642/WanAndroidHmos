@@ -9,6 +9,7 @@ import { emitter } from "@kit.BasicServicesKit"
 import { data } from "@kit.TelephonyKit"
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 import { CommonArticlesBean, CommonPagingBean } from "lib_components"
+import { EditOuterCollectDialog } from "./EditOuterCollectDialog"
 
 @Component
 export struct CollectionsPage {
@@ -20,6 +21,59 @@ export struct CollectionsPage {
   @State msgError: string = '数据异常'
   @State msgNoData: string = '暂无收藏'
   @State isAllLoadOver: boolean = false
+  @State collectTitle: string = ''
+  @State collectAuthor: string = ''
+  @State collectLink: string = ''
+  @State isUpdateHandle: boolean = false
+  @State isShowCollectButton: boolean = true
+  @State currentEditCollectItem: CommonArticlesBean = new CommonArticlesBean()
+  editCollectDialogController: CustomDialogController = new CustomDialogController({
+    builder: EditOuterCollectDialog({
+      title: this.collectTitle,
+      author: this.collectAuthor,
+      link: this.collectLink,
+      onSaveCollectCallback: () => {
+        if (this.isUpdateHandle) {
+          //编辑收藏的文章
+          this.requestUpdateCollectArticle()
+        } else {
+          //新增收藏站外文章
+          this.requestCollectOuterArticle()
+        }
+      }
+    }),
+    backgroundColor: Color.White,
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    cornerRadius: 10
+  })
+
+  private requestCollectOuterArticle() {
+    mCollectViewModel.collectOuterArticle(this.collectTitle, this.collectAuthor, this.collectLink)
+      .then((data: string) => {
+        ToastUtil.showToast(data)
+        this.editCollectDialogController.close()
+        this.pageIndex = 0
+        this.requestCollectionsList()
+      })
+      .catch((msg: string) => {
+        ToastUtil.showToast(msg)
+      })
+  }
+
+  private requestUpdateCollectArticle() {
+    mCollectViewModel.updateCollectArticle(this.currentEditCollectItem.id, this.collectTitle, this.collectAuthor,
+      this.collectLink)
+      .then((data: string) => {
+        ToastUtil.showToast(data)
+        this.editCollectDialogController.close()
+        this.pageIndex = 0
+        this.requestCollectionsList()
+      })
+      .catch((msg: string) => {
+        ToastUtil.showToast(msg)
+      })
+  }
 
   aboutToAppear(): void {
     EmitterUtils.getInstance().on(AppConstant.FLAG_LOGIN_SUCCESS, (eventData: emitter.EventData) => {
@@ -33,8 +87,7 @@ export struct CollectionsPage {
   }
 
   build() {
-    Column() {
-
+    Stack({ alignContent: Alignment.BottomEnd }) {
       BasePage({
         pageState: this.pageState,
         refreshStatus: this.refreshStatus,
@@ -62,7 +115,29 @@ export struct CollectionsPage {
       })
         .layoutWeight(1)
         .width('100%')
+      if (this.isShowCollectButton) {
 
+        Image($r('app.media.ic_collect_float_btn'))
+          .width(40)
+          .height(40)
+          .objectFit(ImageFit.Cover)
+          .shadow({
+            radius: 10,
+            color: $r('app.color.app_theme_color'),
+            type: ShadowType.BLUR
+          })
+          .backgroundColor(Color.Transparent)
+          .margin(15)
+          .onClick(() => {
+            this.isUpdateHandle = false
+            this.collectTitle = ''
+            this.collectAuthor = ''
+            this.collectLink = ''
+            this.editCollectDialogController.open()
+          })
+
+
+      }
     }.width('100%')
     .height('100%')
   }
@@ -95,7 +170,7 @@ export struct CollectionsPage {
 
   @Builder
   ContentListView(scroller: Scroller) {
-    List({ scroller: scroller, space: 12 }) {
+    List({ scroller: scroller }) {
       LazyForEach(this.collectionsList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           CollectionItemView({
@@ -103,16 +178,31 @@ export struct CollectionsPage {
             index: index,
             onCollectRemove: (data: CommonArticlesBean, i: number) => {
               this.handleCancelCollect(data, i)
+            },
+            onCollectEdit: (data: CommonArticlesBean, i: number) => {
+              this.isUpdateHandle = true
+              this.currentEditCollectItem = data
+              this.collectTitle = data.title
+              this.collectAuthor = data.author
+              this.collectLink = data.link
+              this.editCollectDialogController.open()
             }
           })
             .onClick(() => {
               WebViewPage.startPage(item.link, true, item.title)
             })
         }
+        .margin({ top: index == 0 ? 16 : 8, bottom: 8 })
         .padding({ left: 15, right: 15 })
-      }, (item: CommonArticlesBean) => item.id)
+      }, (item: CommonArticlesBean) => JSON.stringify(item))
     }.width('100%')
     .cachedCount(4)
+    .onScrollStart(() => {
+      this.isShowCollectButton = false
+    })
+    .onScrollStop(() => {
+      this.isShowCollectButton = true
+    })
   }
 
   private handleCancelCollect(item: CommonArticlesBean, index: number) {
@@ -141,13 +231,14 @@ struct CollectionItemView {
   item: CommonArticlesBean
   index: number = 0
   onCollectRemove?: (data: CommonArticlesBean, index: number) => void
+  onCollectEdit?: (data: CommonArticlesBean, index: number) => void
 
   build() {
     Row() {
       Column({ space: 10 }) {
         Row() {
           Text('分类：').fontColor(Color.Gray).fontSize(12)
-          Text(this.item.chapterName).fontColor(Color.Grey).fontSize(12)
+          Text(this.item.chapterName == '' ? '--' : this.item.chapterName).fontColor(Color.Grey).fontSize(12)
         }
 
         Text(this.item.title)
@@ -167,9 +258,16 @@ struct CollectionItemView {
       .margin({ right: 10 })
       .alignItems(HorizontalAlign.Start)
 
-
+      Image($r('app.media.ic_edit_collect'))
+        .width(18)
+        .height(18)
+        .objectFit(ImageFit.Fill)
+        .onClick(() => {
+          this.onCollectEdit?.(this.item, this.index)
+        })
       Image($r('app.media.ic_remove_collect'))
         .width(18)
+        .margin({ left: 10 })
         .height(18)
         .objectFit(ImageFit.Fill)
         .onClick(() => {
