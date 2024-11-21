@@ -23,6 +23,25 @@ class SettingViewModel extends BaseViewModel {
         })
     })
   }
+
+  handleLogout(): Promise<string> {
+    this.showLoading()
+    return new Promise<string>(async (resolve, reject) => {
+      httpARequestGet<ResponseResultC<string>>(MineApi.API_LOGOUT)
+        .then((data: ResponseResultC<string>) => {
+          this.hideLoading()
+          if (data.errorCode === 0) {
+            resolve('退出登录成功')
+          } else {
+            reject(data.errorMsg)
+          }
+        })
+        .catch((error: string) => {
+          this.hideLoading()
+          reject(error)
+        })
+    })
+  }
 }
 
 let mSettingViewModel = new SettingViewModel()

@@ -1,5 +1,5 @@
 import { AppConstant, BreakpointTypeEnum, EmitterUtils, PreferenceManager, RouterUtil } from 'utils'
-import { CollectionsPage } from './CollectionsPage';
+import { CollectionArticlePage } from './CollectionArticlePage';
 import { IntegralPage } from './IntegralPage';
 import { NavigationPage } from './NavigationPage';
 import { OfficialAccountsPage } from './OfficialAccountsPage';
@@ -8,6 +8,7 @@ import mMineViewModel from '../viewmodel/MineViewModel';
 import { UserInfo, UserInfoBean } from '../model/UserInfoBean';
 import { IntegralBean } from '../model/IntegralBean';
 import { SettingPage } from './SettingPage';
+import { CollectionWebPage } from './CollectionWebPage';
 
 import('login/src/main/ets/components/LoginPage');
 
@@ -141,20 +142,26 @@ export struct MinePage {
   MineTabView() {
     Tabs({ index: this.currentTabIndex }) {
       TabContent() {
-        CollectionsPage()
+        CollectionArticlePage()
       }.tabBar(this.MineTabs(0, '收藏文章'))
       .backgroundColor($r('app.color.color_FAFAFA'))
       .padding({ top: 12 })
 
       TabContent() {
+        CollectionWebPage()
+      }.tabBar(this.MineTabs(1, '收藏网站'))
+      .backgroundColor($r('app.color.color_FAFAFA'))
+      .padding({ top: 12 })
+
+      TabContent() {
         NavigationPage()
-      }.tabBar(this.MineTabs(1, '导航'))
+      }.tabBar(this.MineTabs(2, '导航'))
       .backgroundColor($r('app.color.color_FAFAFA'))
       .padding({ top: 12 })
 
       TabContent() {
         OfficialAccountsPage()
-      }.tabBar(this.MineTabs(2, '公众号'))
+      }.tabBar(this.MineTabs(3, '公众号'))
       .backgroundColor($r('app.color.color_FAFAFA'))
       .padding({ top: 12 })
     }
@@ -169,7 +176,7 @@ export struct MinePage {
     .onChange((index: number) => {
       this.currentTabIndex = index
     })
-    .barWidth(200)
+    .barWidth('90%')
     .barHeight(56)
     .margin({ top: 35 })
     .onTabBarClick((index: number) => {

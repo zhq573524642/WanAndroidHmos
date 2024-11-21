@@ -8,6 +8,7 @@ import { SystemsPage } from "./SystemsPage"
 @Component
 export struct HotProjectPage {
   @Consume('ProjectPathStack') projectPathStack: NavPathStack
+  @Consume('appPathStack') appPathStack: NavPathStack
   @State projectTypeList: Array<ProjectTypeBean> = []
   @State tabsIndex: number = 0
   @State tabItemData: ProjectTypeBean = new ProjectTypeBean()
@@ -27,7 +28,7 @@ export struct HotProjectPage {
             if (index == 0) {
               SystemsPage.startPage()
             } else {
-              this.projectPathStack.pushPathByName('CoursePage', '', true)
+              this.appPathStack.pushPathByName('CoursePage', '', true)
             }
           }
         })

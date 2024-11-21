@@ -106,7 +106,7 @@ export struct LoginPage {
           PreferenceManager.getInstance().setValue(AppConstant.KEY_PASSWORD, data.password)
           PreferenceManager.getInstance().setValue(AppConstant.KEY_NICKNAME, data.nickname)
           PreferenceManager.getInstance().setValue(AppConstant.IS_LOGIN, true)
-          PreferenceManager.getInstance().setValue(AppConstant.USER_ID, data.id)
+          PreferenceManager.getInstance().setValue(AppConstant.KEY_USER_ID, data.id)
             .then(() => {
               EmitterUtils.getInstance().post(AppConstant.FLAG_LOGIN_SUCCESS)
               router.back()
@@ -299,7 +299,7 @@ struct LoginInput {
 
 @Component
 struct LoginAvatar {
-  title: string = ''
+  @Prop title: string
 
   build() {
     Column() {

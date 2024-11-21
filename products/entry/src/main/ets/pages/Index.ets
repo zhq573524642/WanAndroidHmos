@@ -22,6 +22,7 @@ struct Index {
   @Provide('minePathStack') minePathStack: NavPathStack = new NavPathStack()
   @Provide('questionsPathStack') questionsPathStack: NavPathStack = new NavPathStack()
   @State currentIndex: TabBarType = TabBarType.HOME
+  tabsController: TabsController = new TabsController()
 
   aboutToAppear(): void {
     this.initUserInfo()
@@ -30,10 +31,16 @@ struct Index {
       ToastUtil.showCenterToast('请您先登录')
       RouterUtil.pushNamedRouteSingle(RouterNameUtils.PAGE_LOGIN)
     })
+
+    EmitterUtils.getInstance().on(AppConstant.FLAG_LOGOUT_SUCCESS, (eventData: emitter.EventData) => {
+      this.currentIndex = TabBarType.HOME
+      this.tabsController.changeIndex(TabBarType.HOME)
+    })
   }
 
   aboutToDisappear(): void {
     EmitterUtils.getInstance().unregister(AppConstant.FLAG_NO_LOGIN)
+    EmitterUtils.getInstance().unregister(AppConstant.FLAG_LOGOUT_SUCCESS)
     this.breakpointSystem.unregister()
   }
 
@@ -54,7 +61,7 @@ struct Index {
           AppConstant.USERNAME = value
         }
       })
-    PreferenceManager.getInstance().getValue<string>(AppConstant.USER_ID)
+    PreferenceManager.getInstance().getValue<string>(AppConstant.KEY_USER_ID)
       .then((value: string | null) => {
         if (value !== null && value.length > 0) {
           AppConstant.ID = value
@@ -74,7 +81,7 @@ struct Index {
         Flex({
           direction: this.currentBreakpoint === BreakpointTypeEnum.LG ? FlexDirection.RowReverse : FlexDirection.Column,
         }) {
-          Tabs({ index: this.currentIndex }) {
+          Tabs({ index: this.currentIndex, controller: this.tabsController }) {
             TabContent() {
               HomePage()
             }

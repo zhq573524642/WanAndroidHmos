@@ -12,6 +12,11 @@ export class MineApi {
   static readonly API_TODO_UPDATE: string = 'lg/todo/update/'
   static readonly API_TODO_DELETE: string = 'lg/todo/delete/'
   static readonly API_TODO_DONE: string = 'lg/todo/done/'
-  static readonly API_COLLECT_OUTER_ARTICLE = 'lg/collect/add/json';//收藏站外文章
-  static readonly API_EDIT_COLLECT_ARTICLE:string='lg/collect/user_article/update/'
+  static readonly API_COLLECT_OUTER_ARTICLE = 'lg/collect/add/json'; //收藏站外文章
+  static readonly API_EDIT_COLLECT_ARTICLE: string = 'lg/collect/user_article/update/'
+  static readonly API_COLLECTION_WEB_LIST: string = 'lg/collect/usertools/json'; //收藏网站列表
+  static readonly API_COLLECTION_WEB: string = 'lg/collect/addtool/json'; //收藏网站
+  static readonly API_UPDATE_COLLECTION_WEB: string = 'lg/collect/updatetool/json'; //修改收藏网站
+  static readonly API_DELETE_COLLECTION_WEB: string = 'lg/collect/deletetool/json'; //删除收藏网页
+  static readonly API_LOGOUT: string = 'user/logout/json'
 }

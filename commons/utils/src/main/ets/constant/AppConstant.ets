@@ -4,7 +4,7 @@ export class AppConstant {
   static NICKNAME: string = ''
   static PASSWORD: string = ''
   static ID: string = ''
-  static readonly USER_ID: string = 'user_id'
+  static readonly KEY_USER_ID: string = 'user_id'
   static readonly COOKIE: string = 'cookie'
   static COOKIE_VALUE: string = ''
   static readonly KEY_USERNAME: string = 'username'
@@ -17,4 +17,5 @@ export class AppConstant {
   static readonly FLAG_LOGIN_SUCCESS: number = 100101
   static readonly FLAG_CREATE_TODO: number = 100102
   static readonly FLAG_UPDATE_TODO: number = 100103
+  static readonly FLAG_LOGOUT_SUCCESS: number = 100104
 }
