@@ -1,6 +1,6 @@
 import { LoginPage } from 'login';
 import { AppConstant, PreferenceManager, RouterUtil } from 'utils';
-import { AppConstants } from '../constants/AppConstants';
+import { MainConstants } from '../constants/AppConstants';
 
 import('login/src/main/ets/components/LoginPage');
 
@@ -11,7 +11,7 @@ struct SplashPage {
 
   aboutToAppear(): void {
     setTimeout(() => {
-      RouterUtil.replaceUrl('pages/Index')
+      RouterUtil.replaceUrl('pages/MainPage')
     }, 2000)
   }
 

@@ -4,57 +4,62 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from 'commons/src/main/ets/
 import { ToastUtil } from 'utils/src/main/ets/utils/ToastUtil'
 import { SystemChildrenList, SystemsListBean } from '../model/SystemsListBean'
 import mSystemsViewModel from '../viewmodel/SystemsViewModel'
-import { LengthMetrics, router } from '@kit.ArkUI'
-import { SystemsChildPage } from './SystemsChildPage'
-import { FeatureUtils, PageTitleComponent } from 'lib_components'
-import { RouterUtil } from 'utils'
+import { CommonPageTitle, FeatureUtils } from 'lib_components'
+import { PreferenceManager, RouterUtil } from 'utils'
+import { data } from '@kit.TelephonyKit'
+import { BusinessError } from '@kit.BasicServicesKit'
 
-@Entry({routeName:'SystemsPage'})
 @Component
 export struct SystemsPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
   @State systemsList: Array<SystemsListBean> = []
-
-  static startPage(){
-    RouterUtil.pushNamedRoute('SystemsPage')
-  }
-
-  static startPageIndex(){
-    RouterUtil.pushNamedRoute('SystemsPage')
-  }
+  navPathStack: NavPathStack = new NavPathStack()
 
   aboutToAppear(): void {
-    this.getSystemsListData()
+
   }
 
   build() {
-    Column() {
-      PageTitleComponent({
-        title: '体系',
-        isShowLeftIcon: true,
-        onLeftIconClick: () => {
-          router.back()
-        }
-      })
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ListView(_scroller)
-        },
-        onRefreshing: () => {
-          this.getSystemsListData()
-        }
-      })
-        .layoutWeight(1)
+    NavDestination() {
+      Column() {
+        BasePage({
+          pageState: this.pageState,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ListView(_scroller)
+          },
+          onRefreshing: () => {
+            this.getSystemsListData()
+          }
+        })
+          .layoutWeight(1)
 
-    }.width('100%')
-    .justifyContent(FlexAlign.Start)
-    .height('100%')
-    .backgroundColor(Color.White)
+      }.width('100%')
+      .height('100%')
+      .backgroundColor(Color.White)
+    }.mode(NavDestinationMode.STANDARD)
+    .title(CommonPageTitle('体系'))
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context?.pathStack
+      PreferenceManager.getInstance().getValue<Array<SystemsListBean>>('systems_list')
+        .then((data: Array<SystemsListBean> | null) => {
+          if (data != null && data.length > 0) {
+            this.systemsList = data
+            this.pageState = DefaultStateEnum.NORMAL
+          } else {
+            this.getSystemsListData()
+          }
+        })
+        .catch((error: BusinessError) => {
+          this.getSystemsListData()
+        })
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight')
+    })
   }
 
   private getSystemsListData() {
@@ -63,10 +68,11 @@ export struct SystemsPage {
         this.refreshStatus = HeaderRefreshStatus.inactive
         if (data.length > 0) {
           this.pageState = DefaultStateEnum.NORMAL
-          this.systemsList = data
         } else {
           this.pageState = DefaultStateEnum.EMPTY
         }
+        this.systemsList = data
+        PreferenceManager.getInstance().setValue<Array<SystemsListBean>>('systems_list', data)
       })
       .catch((msg: string) => {
         this.refreshStatus = HeaderRefreshStatus.inactive
@@ -90,7 +96,10 @@ export struct SystemsPage {
                   })
                 }
                 .onClick(() => {
-                  SystemsChildPage.startPage(itemChild.name, itemChild.id)
+                  this.navPathStack.pushPathByName('SystemsChildPage', new Object({
+                    'title': itemChild.name,
+                    'itemId': itemChild.id
+                  }))
                 })
               }, (itemChild: SystemChildrenList) => itemChild.id + '')
             }
@@ -142,4 +151,9 @@ export struct SystemsItemView {
       .borderColor(FeatureUtils.getRandomColor())
       .backgroundColor(Color.White)
   }
+}
+
+@Builder
+export function SystemsPageBuilder() {
+  SystemsPage()
 }

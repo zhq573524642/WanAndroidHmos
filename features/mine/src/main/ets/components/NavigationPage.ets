@@ -14,7 +14,7 @@ export struct NavigationPage {
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.hidden
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
   @State dataList: LazyDataSource<NavigationData> = new LazyDataSource()
-
+  @Consume('appPathStack') appPathStack: NavPathStack
   aboutToAppear(): void {
     this.requestNavigationData()
   }
@@ -23,13 +23,14 @@ export struct NavigationPage {
     Column() {
       BasePage({
         pageState: this.pageState,
+        isNeedRetry: true,
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
         ContentViewPage: (_scroller: Scroller) => {
           this.ContentListView(_scroller)
         },
         onErrorRetryCallback: () => {
-
+          this.requestNavigationData()
         }
       })
         .layoutWeight(1)
@@ -67,7 +68,7 @@ export struct NavigationPage {
                   .fontSize(14)
                   .fontWeight(FontWeight.Bold)
                   .onClick(() => {
-                    WebViewPage.startPage(article.link,true,article.title)
+                    WebViewPage.startPage(this.appPathStack,article.link,true,article.title)
                   })
               }, (article: CommonArticlesBean) => article.id + '')
             }.width('100%')

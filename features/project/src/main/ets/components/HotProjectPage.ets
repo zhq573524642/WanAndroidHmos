@@ -3,7 +3,7 @@ import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import { ProjectTypeBean } from "../model/ProjectTypeBean"
 import mProjectsViewModel from "../viewmodel/ProjectsViewModel"
 import { HotProjectListPage } from "./HotProjectListPage"
-import { SystemsPage } from "./SystemsPage"
+
 
 @Component
 export struct HotProjectPage {
@@ -26,7 +26,7 @@ export struct HotProjectPage {
           rightIcons: [$r('app.media.ic_systems_icon'), $r('app.media.ic_course')],
           onRightIconClick: (icon: ResourceStr, index: number) => {
             if (index == 0) {
-              SystemsPage.startPage()
+              this.appPathStack.pushPathByName('SystemsPage', '', true)
             } else {
               this.appPathStack.pushPathByName('CoursePage', '', true)
             }
@@ -52,9 +52,13 @@ export struct HotProjectPage {
       }.width('100%')
       .height('100%')
       .backgroundColor(Color.White)
+      .padding({
+        top: AppStorage.get<number>('statusBarHeight')
+      })
     }.hideTitleBar(true)
     .hideToolBar(true)
     .mode(NavigationMode.Stack)
+
   }
 
   private getProjectsType() {

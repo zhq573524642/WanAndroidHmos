@@ -15,6 +15,10 @@ export function setHeader(key: string, value: string) {
   axios.defaults.headers.common[key] = value
 }
 
+export function getHeader(key: string): string | undefined {
+  return axios.defaults.headers.common[key]?.toString()
+}
+
 //添加请求拦截器
 axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // 对请求数据做点什么

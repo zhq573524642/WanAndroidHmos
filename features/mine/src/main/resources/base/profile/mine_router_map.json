@@ -4,6 +4,26 @@
       "name": "MyTodoPage",
       "pageSourceFile": "src/main/ets/components/MyTodoPage.ets",
       "buildFunction": "MyTodoPageBuilder"
+    },
+    {
+      "name": "IntegralPage",
+      "pageSourceFile": "src/main/ets/components/IntegralPage.ets",
+      "buildFunction": "IntegralPageBuilder"
+    },
+    {
+      "name": "SettingPage",
+      "pageSourceFile": "src/main/ets/components/SettingPage.ets",
+      "buildFunction": "SettingPageBuilder"
+    },
+    {
+      "name": "ToolsPage",
+      "pageSourceFile": "src/main/ets/components/ToolsPage.ets",
+      "buildFunction": "ToolsPageBuilder"
+    },
+    {
+      "name": "IntegralRecordPage",
+      "pageSourceFile": "src/main/ets/components/IntegralRecordPage.ets",
+      "buildFunction": "IntegralRecordPageBuilder"
     }
   ]
 }

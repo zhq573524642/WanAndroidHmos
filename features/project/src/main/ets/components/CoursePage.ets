@@ -1,7 +1,7 @@
 import { BasePage } from "commons"
 import { DefaultStateEnum } from "commons/src/main/ets/components/defaultState/DefaultStateEnum"
 import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/components/SVRefresh/SVRefresh"
-import { FeatureUtils } from "lib_components"
+import { CommonPageTitle, FeatureUtils } from "lib_components"
 import { CourseListBean } from "../model/CourseListBean"
 import mCourseViewModel from "../viewmodel/CourseViewModel"
 import { BusinessError } from "@kit.BasicServicesKit"
@@ -36,9 +36,13 @@ export struct CoursePage {
       .height('100%')
     }.mode(NavDestinationMode.STANDARD)
     .backgroundColor(FeatureUtils.getGrayBgColor())
-    .title('教程')
+    .title(CommonPageTitle('教程'))
     .onReady((context: NavDestinationContext) => {
       this.navPathStack = context?.pathStack
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
     })
   }
 

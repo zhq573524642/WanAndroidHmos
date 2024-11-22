@@ -1,13 +1,11 @@
 import { AppConstant, BreakpointTypeEnum, EmitterUtils, PreferenceManager, RouterUtil } from 'utils'
 import { CollectionArticlePage } from './CollectionArticlePage';
-import { IntegralPage } from './IntegralPage';
 import { NavigationPage } from './NavigationPage';
 import { OfficialAccountsPage } from './OfficialAccountsPage';
 import { emitter } from '@kit.BasicServicesKit';
 import mMineViewModel from '../viewmodel/MineViewModel';
 import { UserInfo, UserInfoBean } from '../model/UserInfoBean';
 import { IntegralBean } from '../model/IntegralBean';
-import { SettingPage } from './SettingPage';
 import { CollectionWebPage } from './CollectionWebPage';
 
 import('login/src/main/ets/components/LoginPage');
@@ -15,6 +13,7 @@ import('login/src/main/ets/components/LoginPage');
 @Component
 export struct MinePage {
   @Consume('minePathStack') minePathStack: NavPathStack;
+  @Consume('appPathStack') appPathStack: NavPathStack
   @StorageProp('currentBreakpoint') currentBreakpoint: string = BreakpointTypeEnum.MD;
   @State currentTabIndex: number = 0
   @State username: string = '---'
@@ -28,6 +27,7 @@ export struct MinePage {
     EmitterUtils.getInstance().on(AppConstant.FLAG_LOGIN_SUCCESS, (eventData: emitter.EventData) => {
       this.username = AppConstant.NICKNAME !== '' ? AppConstant.NICKNAME :
         (AppConstant.USERNAME !== '' ? AppConstant.USERNAME : '---')
+      this.getUserInfo()
     })
     this.getUserInfo()
   }
@@ -52,7 +52,6 @@ export struct MinePage {
   }
 
   build() {
-
     Navigation(this.minePathStack) {
       Stack({ alignContent: Alignment.Top }) {
         // BackgroundImage view;
@@ -70,6 +69,9 @@ export struct MinePage {
           .width('100%')
           .layoutWeight(1)
         }
+        .padding({
+          top: AppStorage.get<number>('statusBarHeight'),
+        })
         .width('100%')
         .layoutWeight(1)
 
@@ -89,7 +91,7 @@ export struct MinePage {
         .objectFit(ImageFit.Cover)
         .margin({ right: 16 })
         .onClick(() => {
-          this.minePathStack.pushPathByName('MyTodoPage', '', true)
+          this.appPathStack.pushPathByName('MyTodoPage', '', true)
         })
       Image($r('app.media.ic_integral'))
         .width(25)
@@ -97,7 +99,7 @@ export struct MinePage {
         .objectFit(ImageFit.Cover)
         .margin({ right: 16 })
         .onClick(() => {
-          IntegralPage.startPage()
+          this.appPathStack.pushPathByName('IntegralPage', '', true)
         })
       Image($r('app.media.ic_setting'))
         .width(25)
@@ -105,8 +107,7 @@ export struct MinePage {
         .objectFit(ImageFit.Cover)
         .margin({ right: 20 })
         .onClick(() => {
-          // RouterUtil.pushNamedRoute('LoginPage')
-          SettingPage.startPage()
+          this.appPathStack.pushPathByName('SettingPage', '', true)
         })
     }.width('100%')
     .margin({ top: 10, bottom: 10 })
@@ -145,13 +146,11 @@ export struct MinePage {
         CollectionArticlePage()
       }.tabBar(this.MineTabs(0, '收藏文章'))
       .backgroundColor($r('app.color.color_FAFAFA'))
-      .padding({ top: 12 })
 
       TabContent() {
         CollectionWebPage()
       }.tabBar(this.MineTabs(1, '收藏网站'))
       .backgroundColor($r('app.color.color_FAFAFA'))
-      .padding({ top: 12 })
 
       TabContent() {
         NavigationPage()
@@ -217,7 +216,6 @@ export struct MinePage {
           { colorMode: ThemeColorMode.DARK, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.04 })
     }
     .width('100%')
-    .aspectRatio(16 / 9)
   }
 }
 

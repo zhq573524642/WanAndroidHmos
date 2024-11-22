@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-import { ConfigurationConstant } from '@kit.AbilityKit';
 import { BreakpointTypeEnum, BreakpointType } from 'utils/src/main/ets/utils/BreakpointSystem';
-import { AppConstants } from '../constants/AppConstants';
+import { MainConstants } from '../constants/AppConstants';
 import { TabBarData, TabBarType, TabsInfo } from '../model/TabBarModel';
 
 @Component
@@ -53,18 +52,18 @@ export struct CustomTabBar {
       color: $r('sys.color.ohos_id_color_text_field_sub_bg')
     })
     .padding(this.currentBreakpoint === BreakpointTypeEnum.LG ? {
-      top: AppConstants.TAB_PERCENT,
-      bottom: AppConstants.TAB_PERCENT
+      top: MainConstants.TAB_PERCENT,
+      bottom: MainConstants.TAB_PERCENT
     } : { bottom: this.naviIndicatorHeight })
     .clip(false)
     .height(new BreakpointType<Length>({
-      sm: AppConstants.TAB_HEIGHT + (this.naviIndicatorHeight || 0),
-      md: AppConstants.TAB_HEIGHT + (this.naviIndicatorHeight || 0),
-      lg: AppConstants.FULL_PERCENT
+      sm: MainConstants.TAB_HEIGHT + (this.naviIndicatorHeight || 0),
+      md: MainConstants.TAB_HEIGHT + (this.naviIndicatorHeight || 0),
+      lg: MainConstants.FULL_PERCENT
     }).getValue(this.currentBreakpoint))
     .width(new BreakpointType<Length>({
-      sm: AppConstants.FULL_PERCENT,
-      md: AppConstants.FULL_PERCENT,
+      sm: MainConstants.FULL_PERCENT,
+      md: MainConstants.FULL_PERCENT,
       lg: 96
     }).getValue(this.currentBreakpoint))
   }
@@ -89,7 +88,7 @@ struct TabItem {
       Text(TabsInfo[this.index].title)
         .fontSize('10fp')
         .margin({ top: 5 })
-        .fontWeight(AppConstants.TAB_FONT_WEIGHT)
+        .fontWeight(MainConstants.TAB_FONT_WEIGHT)
         .fontColor(this.index === this.selectedIndex ?
         $r('app.color.color_515151') :
         $r('app.color.color_dbdbdb'))
@@ -100,8 +99,8 @@ struct TabItem {
       { left: 8, right: 8 })
     .layoutWeight(1)
     .size(this.currentBreakpoint === BreakpointTypeEnum.LG ?
-      { width: AppConstants.FULL_PERCENT } :
-      { height: AppConstants.FULL_PERCENT })
+      { width: MainConstants.FULL_PERCENT } :
+      { height: MainConstants.FULL_PERCENT })
     .justifyContent(FlexAlign.Center)
     .onClick(() => {
       if (this.selectedIndex !== this.index) {

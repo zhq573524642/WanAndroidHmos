@@ -17,12 +17,21 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from "commons/src/main/ets/
 import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource";
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
 import { HomeSearchPage } from "./HomeSearchPage";
-import { ResponseResultC, RouterUtil } from "utils";
+import {
+  AppConstant,
+  getHeader,
+  PreferenceManager,
+  ResponseResultC,
+  RouterNameUtils,
+  RouterUtil,
+  setHeader
+} from "utils";
 
 
 @Component
 export struct HomePage {
   @Consume('homePathStack') homePathStack: NavPathStack
+  @Consume('appPathStack') appPathStack: NavPathStack
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
   @State bannerList: Array<BannerData> = []
@@ -37,10 +46,25 @@ export struct HomePage {
   @State unreadMessageCount: number = 0
 
   aboutToAppear(): void {
-    this.getUnreadMsgCount()
     this.getHomeBannerData()
     this.getHomeArticleList()
     this.getHomeWelComeTabData()
+    if (getHeader('cookie')) {
+      this.getUnreadMsgCount()
+    } else {
+      PreferenceManager.getInstance().getValue<string[]>(AppConstant.COOKIE)
+        .then((value: string[] | null) => {
+          if (value !== null) {
+            let s = ''
+            value.forEach((cookie: string) => {
+              s += cookie + ';'
+            })
+            setHeader('cookie', s)
+            this.getUnreadMsgCount()
+          }
+        })
+    }
+
   }
 
   @Builder
@@ -51,7 +75,7 @@ export struct HomePage {
         .height(25)
         .objectFit(ImageFit.Cover)
         .onClick(() => {
-          HomeSearchPage.startPage()
+          this.appPathStack.pushPathByName('HomeSearchPage', '', true)
         })
       Stack({ alignContent: Alignment.Center }) {
         Image($r('app.media.ic_home_message'))
@@ -73,7 +97,12 @@ export struct HomePage {
         }
       }.margin({ left: 12 })
       .onClick(() => {
-        this.homePathStack.pushPathByName("MessagesPage", '', true)
+        if (AppConstant.isLogin) {
+          this.appPathStack.pushPathByName("MessagesPage", '', true)
+        } else {
+          ToastUtil.showToast('请您先登录')
+          RouterUtil.pushNamedRouteSingle(RouterNameUtils.PAGE_LOGIN)
+        }
       })
     }
 
@@ -90,6 +119,7 @@ export struct HomePage {
         })
         BasePage({
           pageState: this.pageState,
+          isNeedRetry: true,
           refreshStatus: this.refreshStatus,
           loadMoreStatus: this.loadMoreStatus,
           ContentViewPage: (_scroller: Scroller) => {
@@ -119,6 +149,9 @@ export struct HomePage {
       .height('100%')
     }
     .hideToolBar(true)
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+    })
   }
 
   @Builder
@@ -179,10 +212,11 @@ export struct HomePage {
             item: item,
             onArticleAuthorClick: (isAuthor: boolean) => {
               if (isAuthor) {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author,
+                CommonShareArticlePage.startPage(this.appPathStack, ArticleFromType.ArticleByAuthor, item.userId,
+                  '作者:' + item.author,
                   item.author)
               } else {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId,
+                CommonShareArticlePage.startPage(this.appPathStack, ArticleFromType.ArticleByOther, item.userId,
                   '分享人:' + item.shareUser)
               }
             },
@@ -197,7 +231,7 @@ export struct HomePage {
             }
           })
             .onClick(() => {
-              WebViewPage.startPage(item.link, true, item.title)
+              WebViewPage.startPage(this.appPathStack, item.link, true, item.title)
             })
         }.margin({ left: 20, right: 20 })
       }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
@@ -288,6 +322,7 @@ export struct HomePage {
 @Component
 export struct BannerView {
   @Prop data: Array<BannerData>
+  @Consume('appPathStack') appPathStack: NavPathStack
 
   build() {
     Column() {
@@ -298,7 +333,7 @@ export struct BannerView {
             .borderRadius(15)
             .objectFit(ImageFit.Contain)
             .onClick(() => {
-              WebViewPage.startPage(item.url, true, item.title)
+              WebViewPage.startPage(this.appPathStack, item.url, true, item.title)
             })
         }, (item: BannerData) => item.id + '')
       }
@@ -331,6 +366,7 @@ export struct WelcomeTabItem {
   type: number = 2 //由于接口肿分别用name和title两个字段，所以用type区分一下
   title: string = ''
   @Prop list: Array<CommonArticlesBean> = []
+  @Consume('appPathStack') appPathStack: NavPathStack
 
   build() {
     Column() {
@@ -345,13 +381,13 @@ export struct WelcomeTabItem {
           .maxLines(2)
           .textAlign(TextAlign.Start)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .onClick(()=>{
-            if (this.type==1) {
+          .onClick(() => {
+            if (this.type == 1) {
 
-            }else if (this.type==2){
-              WebViewPage.startPage(item.link,true,item.title)
-            }else {
-              RouterUtil.pushNamedRoute('SystemsPage')
+            } else if (this.type == 2) {
+              WebViewPage.startPage(this.appPathStack, item.link, true, item.title)
+            } else {
+              this.appPathStack.pushPathByName('SystemsPage', '', true)
             }
           })
       }, (item: CommonArticlesBean) => item.id + '')

@@ -13,6 +13,7 @@ import emitter from "@ohos.events.emitter"
 
 @Component
 export struct CollectionWebPage {
+  @Consume('appPathStack') appPathStack: NavPathStack
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.hidden
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
@@ -86,6 +87,7 @@ export struct CollectionWebPage {
     Stack({ alignContent: Alignment.BottomEnd }) {
       BasePage({
         pageState: this.pageState,
+        isNeedRetry: true,
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
         msgError: this.msgError,
@@ -179,7 +181,7 @@ export struct CollectionWebPage {
             }
           })
             .onClick(() => {
-              WebViewPage.startPage(item.link, true, item.name)
+              WebViewPage.startPage(this.appPathStack,item.link, true, item.name)
             })
         }
         .margin({ top: index == 0 ? 16 : 8, bottom: 8 })

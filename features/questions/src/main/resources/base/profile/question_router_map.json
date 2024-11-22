@@ -4,6 +4,11 @@
       "name": "QuestionsDetailPage",
       "pageSourceFile": "src/main/ets/components/QuestionsDetailPage.ets",
       "buildFunction": "QuestionsDetailPageBuilder"
+    },
+    {
+      "name": "PlazaDataPage",
+      "pageSourceFile": "src/main/ets/components/PlazaDataPage.ets",
+      "buildFunction": "PlazaDataPageBuilder"
     }
   ]
 }

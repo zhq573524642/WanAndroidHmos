@@ -20,10 +20,6 @@ export struct CourseDetailPage {
   @State dataList: LazyDataSource<CommonArticlesBean> = new LazyDataSource()
   @State isAllLoadOver: boolean = false
 
-  aboutToAppear(): void {
-
-  }
-
   build() {
     NavDestination() {
       Column() {
@@ -72,6 +68,10 @@ export struct CourseDetailPage {
       }
       this.getCourseDetailCatalogList()
     })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
   }
 
   @Builder
@@ -83,7 +83,7 @@ export struct CourseDetailPage {
             item: item
           })
             .onClick(()=>{
-              WebViewPage.startPage(item.link,true,item.title)
+              WebViewPage.startPage(this.navPathStack,item.link,true,item.title)
             })
 
         }

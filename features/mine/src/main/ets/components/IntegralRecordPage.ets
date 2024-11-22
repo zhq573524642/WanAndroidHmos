@@ -9,7 +9,6 @@ import { RouterNameUtils, RouterUtil, ToastUtil } from "utils"
 import mMineViewModel from "../viewmodel/MineViewModel"
 import mIntegralViewModel from "../viewmodel/IntegralViewModel"
 
-@Entry({ routeName: RouterNameUtils.PAGE_INTEGRAL_RECORD })
 @Component
 export struct IntegralRecordPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
@@ -18,50 +17,64 @@ export struct IntegralRecordPage {
   @State dataList: LazyDataSource<IntegralRecordBean> = new LazyDataSource()
   @State pageIndex: number = 1
   @State isAllLoadOver: boolean = false
-
-  static startPage() {
-    RouterUtil.pushNamedRoute(RouterNameUtils.PAGE_INTEGRAL_RECORD)
-  }
+  navPathStack: NavPathStack = new NavPathStack()
 
   aboutToAppear(): void {
     this.getIntegralRecordList()
   }
 
   build() {
-    Column() {
-      PageTitleComponent({
-        title: '积分获取记录',
-        isShowLeftIcon: true,
-        onLeftIconClick: () => {
-          router.back()
-        }
-      })
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ContentView(_scroller)
-        },
-        onRefreshing: () => {
-          this.pageIndex = 1
-          this.getIntegralRecordList()
-        },
-        onLoadingMore: () => {
-          if (this.isAllLoadOver) {
-            ToastUtil.showToast('暂无更多数据')
-            this.loadMoreStatus = FooterLoadMoreStatus.inactive
-            return
+    NavDestination() {
+      Column() {
+        PageTitleComponent({
+          title: '积分获取记录',
+          isShowLeftIcon: true,
+          onLeftIconClick: () => {
+            router.back()
           }
-          this.getIntegralRecordList()
-        }
-      })
-        .layoutWeight(1)
+        })
+        BasePage({
+          pageState: this.pageState,
+          isNeedRetry: true,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ContentView(_scroller)
+          },
+          onRefreshing: () => {
+            this.pageIndex = 1
+            this.getIntegralRecordList()
+          },
+          onLoadingMore: () => {
+            if (this.isAllLoadOver) {
+              ToastUtil.showToast('暂无更多数据')
+              this.loadMoreStatus = FooterLoadMoreStatus.inactive
+              return
+            }
+            this.getIntegralRecordList()
+          },
+          onErrorRetryCallback: () => {
+            this.pageIndex = 1
+            this.getIntegralRecordList()
+          }
+        })
+          .layoutWeight(1)
 
-    }.width('100%')
-    .justifyContent(FlexAlign.Start)
-    .height('100%')
+      }.width('100%')
+      .justifyContent(FlexAlign.Start)
+      .height('100%')
+    }
+    .title('积分获取记录')
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
     .backgroundColor(Color.White)
+    .mode(NavDestinationMode.STANDARD)
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context?.pathStack
+    })
+
   }
 
   private getIntegralRecordList() {
@@ -126,4 +139,9 @@ struct IntegralRecordView {
       bottom: 12
     })
   }
+}
+
+@Builder
+export function IntegralRecordPageBuilder(){
+  IntegralRecordPage()
 }

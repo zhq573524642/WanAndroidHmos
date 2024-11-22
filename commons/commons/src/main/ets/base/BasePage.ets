@@ -10,7 +10,8 @@ export struct BasePage {
   @Link loadMoreStatus: FooterLoadMoreStatus
   @Prop pageState?: DefaultStateEnum = DefaultStateEnum.LOADING
   @Prop msgNoData?: string = '暂无数据'
-  @Prop msgError?: string = '数据异常，点击重试'
+  @Prop msgError?: string = '数据异常'
+  @Prop isNeedRetry: boolean = false
   onErrorRetryCallback?: () => void
   @BuilderParam ContentViewPage: (scroller: Scroller) => void
   onRefreshing?: () => void
@@ -53,6 +54,7 @@ export struct BasePage {
       defaultState: this.pageState,
       noDataMsg: this.msgNoData,
       errorMsg: this.msgError,
+      isNeedRetry: this.isNeedRetry,
       normalPage: () => {
         this.ContentViewPage(scroller)
       },

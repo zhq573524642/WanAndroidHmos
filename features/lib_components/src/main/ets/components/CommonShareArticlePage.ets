@@ -21,7 +21,6 @@ export enum ArticleFromType {
   ArticleBySearch
 }
 
-@Entry({ routeName: 'CommonShareArticlePage' })
 @Component
 export struct CommonShareArticlePage {
   @State mCommonViewModel: CommonViewModel = CommonViewModel.getInstance()
@@ -47,28 +46,20 @@ export struct CommonShareArticlePage {
   @State tempPageIndex: number = 1
   @State tempIsAllLoadOver: boolean = false
   @State inputContent: string = ''
+  navPathStack: NavPathStack = new NavPathStack()
 
-  static startPage(fromType: ArticleFromType, userId: number, title: string, authorName?: string) {
-    RouterUtil.pushNamedRoute('CommonShareArticlePage', {
+  static startPage(navPathStack: NavPathStack, fromType: ArticleFromType, userId: number, title: string,
+    authorName?: string) {
+    navPathStack.pushPathByName('CommonShareArticlePage', new Object({
       "articleFromType": fromType,
       "userId": userId,
       "title": title,
       "authorName": authorName ? authorName : ''
-    })
-  }
-
-  aboutToAppear(): void {
-    const params = router.getParams() as Record<string, Object>
-    if (params) {
-      this.userId = params.userId as number
-      this.userTitle = params.title as string
-      this.articleFromType = params.articleFromType as ArticleFromType
-      this.authorName = params.authorName as string
-    }
-    this.getRequestByFromType()
+    }))
   }
 
   private getRequestByFromType() {
+
     if (this.articleFromType == ArticleFromType.ArticleByOther) {
       //分享人分享的文章列表
       //页面从1开始
@@ -99,123 +90,138 @@ export struct CommonShareArticlePage {
   }
 
   build() {
-    Column() {
-      PageTitleComponent({
-        title: this.userTitle,
-        isShowLeftIcon: true,
-        onLeftIconClick: () => {
-          router.back()
-        },
-        isShowRightIcons: this.isShowSearchIcon,
-        rightIcons: [$r('app.media.ic_search')],
-        onRightIconClick: (icon: ResourceStr, index: number) => {
+    NavDestination() {
+      Column() {
+        if (this.isShowSearchLayout) {
+          Row() {
+            Search({ placeholder: '请输入搜索关键词' })
+              .searchButton('搜索')
+              .fontColor(Color.Black)
+              .onChange((value: string) => {
+                if (value === '') {
+                  this.articleFromType = ArticleFromType.ArticleByOfficialAccount
+                  this.dataList.clear()
+                  this.tempDataList.dataArray.forEach((value: CommonArticlesBean) => {
+                    this.dataList.pushData(value)
+                  })
+                  this.pageIndex = this.tempPageIndex
+                  this.isAllLoadOver = this.tempIsAllLoadOver
+                  this.dataList.notifyDataReload()
+                }
+              })
+              .onSubmit((value: string) => {
+                if (value.length <= 0) {
+                  ToastUtil.showToast('请输入搜索关键词')
+                  return
+                }
+                this.articleFromType = ArticleFromType.ArticleBySearch
+                this.dataList.dataArray.forEach((value: CommonArticlesBean) => {
+                  this.tempDataList.pushData(value)
+                })
+                this.tempPageIndex = this.pageIndex
+                this.tempIsAllLoadOver = this.isAllLoadOver
+
+                this.pageIndex = 1
+                this.inputContent = value
+                this.getRequestByFromType()
+              })
+              .height(50)
+              .layoutWeight(1)
+          }.padding({ left: 20, right: 20 })
+          .width('100%')
+        }
+        if (this.isShowUserInfo) {
+          Column({ space: 12 }) {
+            Row() {
+              Text('本站积分：').fontColor(Color.Black).fontSize(15)
+              Text(`${this.userCoinInfo.coinCount}`).fontColor(Color.Red).fontSize(16)
+              Text(`lv ${this.userCoinInfo.level}`)
+                .fontSize(15)
+                .fontColor(Color.White)
+                .backgroundColor(Color.Green)
+                .padding({
+                  top: 4,
+                  bottom: 4,
+                  left: 7,
+                  right: 7
+                })
+                .margin({ left: 12 })
+                .borderRadius(5)
+              Text(`排名 ${this.userCoinInfo.rank}`)
+                .fontSize(15)
+                .fontColor(Color.White)
+                .backgroundColor(Color.Pink)
+                .padding({
+                  top: 4,
+                  bottom: 4,
+                  left: 7,
+                  right: 7
+                })
+                .margin({ left: 12 })
+                .borderRadius(5)
+            }
+
+            Text(`分享了${this.totalArticles}篇文章`).fontColor(Color.Gray).fontSize(15)
+
+          }.padding(20)
+          .width('100%')
+          .alignItems(HorizontalAlign.Start)
+        }
+
+        BasePage({
+          pageState: this.pageState,
+          isNeedRetry: true,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          msgError: this.msgError,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ContentListView(_scroller)
+          },
+          onRefreshing: () => {
+            this.pageIndex = 1
+            this.getRequestByFromType()
+          },
+          onLoadingMore: () => {
+            if (this.isAllLoadOver) {
+              ToastUtil.showToast('暂无更多数据')
+              this.loadMoreStatus = FooterLoadMoreStatus.inactive
+              return
+            }
+            this.getRequestByFromType()
+          },
+          onErrorRetryCallback: () => {
+            this.getRequestByFromType()
+          }
+        })
+      }.width('100%')
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
+      .height('100%')
+    }.mode(NavDestinationMode.STANDARD)
+    .menus([
+      {
+        value: '搜索',
+        icon: 'resources/base/media/ic_search.png',
+        action: () => {
           this.isShowSearchLayout = !this.isShowSearchLayout
         }
-      })
-
-      if (this.isShowSearchLayout) {
-        Row() {
-          Search({ placeholder: '请输入搜索关键词' })
-            .searchButton('搜索')
-            .fontColor(Color.Black)
-            .onChange((value: string) => {
-              if (value === '') {
-                this.articleFromType = ArticleFromType.ArticleByOfficialAccount
-                this.dataList.clear()
-                this.tempDataList.dataArray.forEach((value: CommonArticlesBean) => {
-                  this.dataList.pushData(value)
-                })
-                this.pageIndex = this.tempPageIndex
-                this.isAllLoadOver = this.tempIsAllLoadOver
-                this.dataList.notifyDataReload()
-              }
-            })
-            .onSubmit((value: string) => {
-              if (value.length <= 0) {
-                ToastUtil.showToast('请输入搜索关键词')
-                return
-              }
-              this.articleFromType = ArticleFromType.ArticleBySearch
-              this.dataList.dataArray.forEach((value: CommonArticlesBean) => {
-                this.tempDataList.pushData(value)
-              })
-              this.tempPageIndex = this.pageIndex
-              this.tempIsAllLoadOver = this.isAllLoadOver
-
-              this.pageIndex = 1
-              this.inputContent = value
-              this.getRequestByFromType()
-            })
-            .height(50)
-            .layoutWeight(1)
-        }.padding({ left: 20, right: 20 })
-        .width('100%')
       }
-      if (this.isShowUserInfo) {
-        Column({ space: 12 }) {
-          Row() {
-            Text('本站积分：').fontColor(Color.Black).fontSize(15)
-            Text(`${this.userCoinInfo.coinCount}`).fontColor(Color.Red).fontSize(16)
-            Text(`lv ${this.userCoinInfo.level}`)
-              .fontSize(15)
-              .fontColor(Color.White)
-              .backgroundColor(Color.Green)
-              .padding({
-                top: 4,
-                bottom: 4,
-                left: 7,
-                right: 7
-              })
-              .margin({ left: 12 })
-              .borderRadius(5)
-            Text(`排名 ${this.userCoinInfo.rank}`)
-              .fontSize(15)
-              .fontColor(Color.White)
-              .backgroundColor(Color.Pink)
-              .padding({
-                top: 4,
-                bottom: 4,
-                left: 7,
-                right: 7
-              })
-              .margin({ left: 12 })
-              .borderRadius(5)
-          }
-
-          Text(`分享了${this.totalArticles}篇文章`).fontColor(Color.Gray).fontSize(15)
-
-        }.padding(20)
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
+    ])
+    .title(this.userTitle)
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context?.pathStack
+      let params = context?.pathInfo?.param as Record<string, Object>
+      if (params) {
+        this.userId = params.userId as number
+        this.userTitle = params.title as string
+        this.articleFromType = params.articleFromType as ArticleFromType
+        this.authorName = params.authorName as string
+        this.getRequestByFromType()
       }
-
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        msgError: this.msgError,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ContentListView(_scroller)
-        },
-        onRefreshing: () => {
-          this.pageIndex = 1
-          this.getRequestByFromType()
-        },
-        onLoadingMore: () => {
-          if (this.isAllLoadOver) {
-            ToastUtil.showToast('暂无更多数据')
-            this.loadMoreStatus = FooterLoadMoreStatus.inactive
-            return
-          }
-          this.getRequestByFromType()
-        },
-        onErrorRetryCallback: () => {
-          this.getRequestByFromType()
-        }
-      })
-    }.width('100%')
-    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
-    .height('100%')
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
   }
 
   private getShareArticleList() {
@@ -347,7 +353,7 @@ export struct CommonShareArticlePage {
               bottom: 8
             })
             .onClick(() => {
-              WebViewPage.startPage(item.link, true, item.title)
+              WebViewPage.startPage(this.navPathStack,item.link, true, item.title)
             })
         }
 
@@ -377,4 +383,9 @@ export struct CommonShareArticlePage {
         ToastUtil.showToast(msg)
       })
   }
+}
+
+@Builder
+export function CommonShareArticlePageBuilder() {
+  CommonShareArticlePage()
 }

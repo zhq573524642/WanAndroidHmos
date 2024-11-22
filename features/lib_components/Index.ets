@@ -12,4 +12,6 @@ export { CommonArticleItem } from './src/main/ets/components/CommonArticleItem'
 
 export * from './src/main/ets/components/CommonShareArticlePage'
 
+export * from './src/main/ets/components/CommonStyles'
+
 

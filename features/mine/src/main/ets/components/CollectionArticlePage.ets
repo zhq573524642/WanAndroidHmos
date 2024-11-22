@@ -13,6 +13,7 @@ import { EditOuterCollectDialog } from "./EditOuterCollectDialog"
 
 @Component
 export struct CollectionArticlePage {
+  @Consume('appPathStack') appPathStack: NavPathStack
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
@@ -90,6 +91,7 @@ export struct CollectionArticlePage {
     Stack({ alignContent: Alignment.BottomEnd }) {
       BasePage({
         pageState: this.pageState,
+        isNeedRetry: true,
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
         msgError: this.msgError,
@@ -189,7 +191,7 @@ export struct CollectionArticlePage {
             }
           })
             .onClick(() => {
-              WebViewPage.startPage(item.link, true, item.title)
+              WebViewPage.startPage(this.appPathStack,item.link, true, item.title)
             })
         }
         .margin({ top: index == 0 ? 16 : 8, bottom: 8 })

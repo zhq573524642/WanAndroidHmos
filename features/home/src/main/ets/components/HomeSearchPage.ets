@@ -16,8 +16,8 @@ import LazyDataSource from "utils/src/main/ets/utils/LazyDataSource"
 import { CommonWebSiteBean } from "../model/CommonWebSiteBean"
 import { SearchHotWord } from "../model/SearchHotWordBean"
 import mSearchViewModel from "../viewmodel/SearchViewModel"
+import { BusinessError } from "@kit.BasicServicesKit"
 
-@Entry({ routeName: 'HomeSearchPage' })
 @Component
 export struct HomeSearchPage {
   @State inputContent: string = ''
@@ -32,10 +32,7 @@ export struct HomeSearchPage {
   @State webSiteList: Array<CommonWebSiteBean> = []
   @State placeholderIndex: number = 0
   intervalId: number = 0
-
-  static startPage() {
-    RouterUtil.pushNamedRoute('HomeSearchPage')
-  }
+  navPathStack: NavPathStack = new NavPathStack()
 
   aboutToAppear(): void {
     this.getSearchHotWord()
@@ -53,75 +50,83 @@ export struct HomeSearchPage {
   }
 
   build() {
-    Column() {
-      Row() {
-        Image($r('app.media.ic_back'))
-          .width(30)
-          .height(30)
-          .objectFit(ImageFit.Fill)
-          .onClick(() => {
-            router.back()
-          })
-        Search({
-          placeholder: this.hotWordList.length > 0 ?
-          this.hotWordList[this.placeholderIndex].name : '请输入搜索内容', value: this.inputContent
-        })
-          .searchButton('搜索')
-          .fontColor(Color.Black)
-          .onFocus(() => {
-            clearInterval(this.intervalId)
-          })
-          .onBlur(() => {
-            this.setSearchPlaceholder()
-          })
-          .onChange((value: string, previewText: PreviewText) => {
-            if (value.length <= 0) {
-              this.isShowSearchResultLayout = false
-            }
-          })
-          .onSubmit((value: string) => {
-            let content = value ? value : this.hotWordList[this.placeholderIndex].name
-            if (content.length <= 0) {
-              ToastUtil.showToast('请输入搜索内容')
+    NavDestination() {
+      Column() {
+        BasePage({
+          pageState: this.pageState,
+          isNeedRetry: true,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ContentView(_scroller)
+          },
+          onRefreshing: () => {
+          },
+          onLoadingMore: () => {
+            if (this.isAllLoadOver) {
+              this.loadMoreStatus = FooterLoadMoreStatus.inactive
+              ToastUtil.showToast('暂无更多数据')
               return
             }
-            this.inputContent = content
-            this.loadMoreStatus = FooterLoadMoreStatus.inactive
             this.requestSearch()
-          })
-          .height(50)
+          },
+          onErrorRetryCallback: () => {
+            if (this.isShowSearchResultLayout) {
+              this.requestSearch()
+            }
+          }
+        })
+          .width('100%')
           .layoutWeight(1)
-      }.padding({ left: 20, right: 20 })
+      }
+      .width('100%')
+      .height('100%')
 
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ContentView(_scroller)
-        },
-        onRefreshing: () => {
-        },
-        onLoadingMore: () => {
-          if (this.isAllLoadOver) {
-            this.loadMoreStatus = FooterLoadMoreStatus.inactive
-            ToastUtil.showToast('暂无更多数据')
+    }
+    .title(this.PageTitle())
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context?.pathStack
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
+
+  }
+
+  @Builder
+  PageTitle() {
+    Row() {
+      Search({
+        placeholder: this.hotWordList.length > 0 ?
+        this.hotWordList[this.placeholderIndex].name : '请输入搜索内容', value: this.inputContent
+      })
+        .searchButton('搜索')
+        .fontColor(Color.Black)
+        .onFocus(() => {
+          clearInterval(this.intervalId)
+        })
+        .onBlur(() => {
+          this.setSearchPlaceholder()
+        })
+        .onChange((value: string, previewText: PreviewText) => {
+          if (value.length <= 0) {
+            this.isShowSearchResultLayout = false
+          }
+        })
+        .onSubmit((value: string) => {
+          let content = value ? value : this.hotWordList[this.placeholderIndex].name
+          if (content.length <= 0) {
+            ToastUtil.showToast('请输入搜索内容')
             return
           }
+          this.inputContent = content
+          this.loadMoreStatus = FooterLoadMoreStatus.inactive
           this.requestSearch()
-        },
-        onErrorRetryCallback: () => {
-          if (this.isShowSearchResultLayout) {
-            this.requestSearch()
-          }
-        }
-      })
-        .width('100%')
+        })
+        .height(50)
         .layoutWeight(1)
-    }
-    .width('100%')
-    .height('100%')
-
+    }.padding({ left: 20, right: 20 })
   }
 
   private requestSearch() {
@@ -151,6 +156,9 @@ export struct HomeSearchPage {
         } else {
           this.requestSearchHotWord()
         }
+      })
+      .catch((error: BusinessError) => {
+        this.requestSearchHotWord()
       })
 
   }
@@ -189,9 +197,11 @@ export struct HomeSearchPage {
             item: item,
             onArticleAuthorClick: (isAuthor: boolean) => {
               if (isAuthor) {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, item.title, item.author)
+                CommonShareArticlePage.startPage(this.navPathStack, ArticleFromType.ArticleByAuthor, item.userId,
+                  item.title, item.author)
               } else {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId, item.title)
+                CommonShareArticlePage.startPage(this.navPathStack, ArticleFromType.ArticleByOther, item.userId,
+                  item.title)
               }
             },
             onArticleCollect: (isCollected: boolean) => {
@@ -205,7 +215,7 @@ export struct HomeSearchPage {
             .margin({ top: index == 0 ? 16 : 8, bottom: 8 })
         }.margin({ left: 20, right: 20 })
         .onClick(() => {
-          WebViewPage.startPage(item.link, true, item.title)
+          WebViewPage.startPage(this.navPathStack, item.link, true, item.title)
         })
       }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
     }
@@ -292,7 +302,7 @@ export struct HomeSearchPage {
               .borderColor(FeatureUtils.getRandomColor())
               .backgroundColor(Color.White)
               .onClick(() => {
-                WebViewPage.startPage(item.link, false, '')
+                WebViewPage.startPage(this.navPathStack, item.link, false, '')
               })
           }, (item: CommonWebSiteBean) => item.id + '')
         }
@@ -304,4 +314,9 @@ export struct HomeSearchPage {
     }.width('100%')
     .layoutWeight(1)
   }
+}
+
+@Builder
+export function HomeSearchPageBuilder() {
+  HomeSearchPage()
 }

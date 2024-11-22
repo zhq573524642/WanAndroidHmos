@@ -96,6 +96,10 @@ export struct MyTodoPage {
     .onReady((context: NavDestinationContext) => {
       this.navPathStack = context.pathStack
     })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
   }
 
   @Builder

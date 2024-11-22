@@ -13,6 +13,7 @@ export struct OfficialAccountsPage {
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
   @State msgError: string = '数据异常'
   @State accountList: Array<OfficialAccountBean> = []
+  @Consume('appPathStack') appPathStack: NavPathStack
 
   aboutToAppear(): void {
     this.getOfficialAccountList()
@@ -25,6 +26,7 @@ export struct OfficialAccountsPage {
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
         msgError: this.msgError,
+        isNeedRetry: true,
         ContentViewPage: (_scroller: Scroller) => {
           this.ContentListView(_scroller)
         },
@@ -74,7 +76,8 @@ export struct OfficialAccountsPage {
             item: item
           })
             .onClick(() => {
-              CommonShareArticlePage.startPage(ArticleFromType.ArticleByOfficialAccount, item.id, item.name)
+              CommonShareArticlePage.startPage(this.appPathStack, ArticleFromType.ArticleByOfficialAccount, item.id,
+                item.name)
             })
         }, (item: OfficialAccountBean) => item.id + '')
       }

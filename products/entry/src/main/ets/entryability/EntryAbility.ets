@@ -4,6 +4,7 @@ import { window } from '@kit.ArkUI';
 import { PreferenceManager } from 'utils/src/main/ets/utils/PreferenceManager';
 import { AppConstant } from 'utils/src/main/ets/constant/AppConstant';
 import { setHeader } from 'utils/src/main/ets/network/ApiRequst';
+import { WindowUtil } from 'utils/src/main/ets/utils/WindowUtil';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -17,6 +18,7 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    WindowUtil.setDeviceSize(windowStage, this.context)
     windowStage.loadContent('pages/SplashPage', (err) => {
       if (err.code) {
         hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');

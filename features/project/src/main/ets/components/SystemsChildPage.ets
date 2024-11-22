@@ -15,19 +15,11 @@ import { FooterLoadMoreStatus, HeaderRefreshStatus } from 'commons/src/main/ets/
 import mSystemsViewModel from '../viewmodel/SystemsViewModel'
 import LazyDataSource from 'utils/src/main/ets/utils/LazyDataSource'
 import { ResponseResultC, ToastUtil } from 'utils'
-import { SystemsSearchPage } from './SystemsSearchPage'
 import { WebViewPage } from 'lib_components/src/main/ets/components/WebViewPage'
 
-@Entry({ routeName: 'SystemsChildPage' })
-@Component
-export struct SystemsChildPage {
-  static startPage(title: string, id: number) {
-    RouterUtil.pushNamedRoute('SystemsChildPage', {
-      'title': title,
-      'itemId': id
-    })
-  }
 
+@Component
+struct SystemsChildPage {
   @State title: string = ''
   @State itemId: number = 0
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
@@ -36,57 +28,64 @@ export struct SystemsChildPage {
   @State dataList: LazyDataSource<CommonArticlesBean> = new LazyDataSource()
   @State pageIndex: number = 0
   @State isAllLoadOver: boolean = false
-
-  aboutToAppear(): void {
-    const params = router.getParams() as Record<string, Object>
-    if (params) {
-      this.title = params['title'] as string
-      this.itemId = params['itemId'] as number
-    }
-    this.getSystemsChildList()
-  }
+  navPathStack: NavPathStack = new NavPathStack()
 
   build() {
-    Column() {
-      PageTitleComponent({
-        title: this.title,
-        isShowLeftIcon: true,
-        onLeftIconClick: () => {
-          router.back()
-        },
-        isShowRightIcons: true,
-        rightIcons: [$r('app.media.ic_search')],
-        onRightIconClick: (icon: ResourceStr, index: number) => {
-          SystemsSearchPage.startPage()
-        }
-      })
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ListView(_scroller)
-        },
-        onRefreshing: () => {
-          this.pageIndex = 0
-          this.getSystemsChildList()
-        },
-        onLoadingMore: () => {
-          if (this.isAllLoadOver) {
-            this.loadMoreStatus = FooterLoadMoreStatus.inactive
-            ToastUtil.showToast('暂无更多数据')
-            return
+    NavDestination() {
+      Column() {
+        BasePage({
+          pageState: this.pageState,
+          isNeedRetry: true,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ListView(_scroller)
+          },
+          onRefreshing: () => {
+            this.pageIndex = 0
+            this.getSystemsChildList()
+          },
+          onLoadingMore: () => {
+            if (this.isAllLoadOver) {
+              this.loadMoreStatus = FooterLoadMoreStatus.inactive
+              ToastUtil.showToast('暂无更多数据')
+              return
+            }
+            this.getSystemsChildList()
+          },
+          onErrorRetryCallback: () => {
+            this.getSystemsChildList()
           }
-          this.getSystemsChildList()
-        },
-        onErrorRetryCallback: () => {
-          this.getSystemsChildList()
+        })
+          .width('100%')
+          .layoutWeight(1)
+      }.width('100%')
+      .backgroundColor('#f5f5f5')
+    }.title(this.title)
+    .menus([
+      {
+        value: '搜索',
+        icon: 'resources/base/media/ic_search.png',
+        action: () => {
+          this.navPathStack.pushPathByName('SystemsSearchPage','',true)
         }
-      })
-        .width('100%')
-        .layoutWeight(1)
-    }.width('100%')
-    .backgroundColor('#f5f5f5')
+      }
+    ])
+    .mode(NavDestinationMode.STANDARD)
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context?.pathStack
+      let params = context?.pathInfo?.param as Record<string, Object>
+      if (params) {
+        this.title = params['title'] as string
+        this.itemId = params['itemId'] as number
+      }
+      this.getSystemsChildList()
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
+
   }
 
   private getSystemsChildList() {
@@ -116,7 +115,7 @@ export struct SystemsChildPage {
 
   @Builder
   ListView(scroller: Scroller) {
-    List({ scroller: scroller, space: 12 }) {
+    List({ scroller: scroller }) {
       LazyForEach(this.dataList, (item: CommonArticlesBean, index: number) => {
         ListItem() {
           CommonArticleItem({
@@ -124,9 +123,11 @@ export struct SystemsChildPage {
             isShowChapterName: false,
             onArticleAuthorClick: (isAuthor: boolean) => {
               if (isAuthor) {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, item.title,item.author)
+                CommonShareArticlePage.startPage(this.navPathStack, ArticleFromType.ArticleByAuthor, item.userId,
+                  item.title, item.author)
               } else {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId, item.title)
+                CommonShareArticlePage.startPage(this.navPathStack, ArticleFromType.ArticleByOther, item.userId,
+                  item.title)
               }
             },
             onArticleCollect: (isCollected: boolean) => {
@@ -138,13 +139,18 @@ export struct SystemsChildPage {
             }
           })
             .onClick(() => {
-              WebViewPage.startPage(item.link, true, item.title)
+              WebViewPage.startPage(this.navPathStack,item.link, true, item.title)
             })
-        }.margin({ left: 20, right: 20 })
+        }
+        .margin({
+          left: 20,
+          right: 20,
+          top: index == 0 ? 16 : 8,
+          bottom: 8
+        })
 
       }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
     }.width('100%')
-    .margin({ bottom: 20 })
     .layoutWeight(1)
     .cachedCount(4)
   }
@@ -169,4 +175,9 @@ export struct SystemsChildPage {
         ToastUtil.showToast(msg)
       })
   }
+}
+
+@Builder
+export function SystemsChildPageBuilder() {
+  SystemsChildPage()
 }

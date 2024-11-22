@@ -5,5 +5,9 @@
     "@ohos/hypium": "1.0.19",
     "@ohos/hamock": "1.0.0"
   },
-  "dynamicDependencies": {}
+  "dynamicDependencies": {},
+  "dependencies": {
+    "@ohos/lottie": "^2.0.14",
+    "@jjr/lottie_component": "^1.0.3"
+  }
 }

@@ -10,6 +10,7 @@ import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 
 @Component
 export struct HotProjectListPage {
+  @Consume('appPathStack') appPathStack: NavPathStack
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
@@ -30,6 +31,7 @@ export struct HotProjectListPage {
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
         msgError: this.msgError,
+        isNeedRetry: true,
         ContentViewPage: (_scroller: Scroller) => {
           this.ContentListView(_scroller)
         },
@@ -128,13 +130,13 @@ export struct HotProjectListPage {
               {
                 value: '站内网页',
                 action: () => {
-                  WebViewPage.startPage(item.link, true, item.title)
+                  WebViewPage.startPage(this.appPathStack,item.link, true, item.title)
                 }
               },
               {
                 value: '站外网页',
                 action: () => {
-                  WebViewPage.startPage(item.projectLink, true, item.title)
+                  WebViewPage.startPage(this.appPathStack,item.projectLink, true, item.title)
                 }
               }
             ])

@@ -10,6 +10,7 @@ export struct DefaultStatePage {
   @Prop errorMsg: string
   icon?: ResourceStr = $r('app.media.ic_common_no_data')
   errorIcon?: ResourceStr = $r('app.media.ic_common_error')
+  @Prop isNeedRetry: boolean = true
   onRetryCallback?: () => void
 
   build() {
@@ -63,13 +64,26 @@ export struct DefaultStatePage {
       Image(this.errorIcon)
         .width(80)
         .height(80)
-        .onClick(() => {
-          this.onRetryCallback?.()
-        })
       Text(this.errorMsg ? this.errorMsg : '数据错误').margin({ top: 15 })
-        .onClick(() => {
-          this.onRetryCallback?.()
-        })
+      if (this.isNeedRetry) {
+        Text('重试')
+          .margin({ top: 8 })
+          .fontColor(Color.Red)
+          .fontSize(13)
+          .textAlign(TextAlign.Center)
+          .borderRadius(10)
+          .borderColor(Color.Red)
+          .borderWidth(1)
+          .padding({
+            left: 8,
+            right: 8,
+            top: 4,
+            bottom: 4
+          })
+          .onClick(() => {
+            this.onRetryCallback?.()
+          })
+      }
     }
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)

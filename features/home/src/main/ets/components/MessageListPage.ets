@@ -12,6 +12,7 @@ import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 @Component
 export struct MessageListPage {
   isRead: boolean = false
+  @Consume('appPathStack') appPathStack: NavPathStack
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
@@ -88,7 +89,7 @@ export struct MessageListPage {
             item: item
           })
             .onClick(()=>{
-              WebViewPage.startPage(item.fullLink,true,item.title)
+              WebViewPage.startPage(this.appPathStack,item.fullLink,true,item.title)
             })
         }
         .margin({

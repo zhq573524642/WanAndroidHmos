@@ -8,9 +8,9 @@ export class IntegralBean {
    "userId": 20382,
    "username": "g**eii"
    */
-  coinCount: string = ''
-  level: string = ''
-  nickname: string = ''
+  coinCount: string = '--'
+  level: string = '--'
+  nickname: string = '--'
   rank: number = 0
   userId: string = ''
   username: string = ''

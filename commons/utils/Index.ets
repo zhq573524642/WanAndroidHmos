@@ -27,3 +27,7 @@ export { EmitterUtils } from './src/main/ets/utils/EmitterUtils'
 export { RouterNameUtils } from './src/main/ets/constant/RouterNameUtils'
 
 export { DateUtil } from './src/main/ets/utils/DateUtil'
+
+export { LoadingUtil } from './src/main/ets/utils/LoadingUtil'
+
+export { WindowUtil } from './src/main/ets/utils/WindowUtil'

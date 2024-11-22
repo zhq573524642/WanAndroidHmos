@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-export class AppConstants {
+export class MainConstants {
   /**
    * 100 percent.
    */

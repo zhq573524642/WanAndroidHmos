@@ -4,6 +4,11 @@
       "name": "MessagesPage",
       "pageSourceFile": "src/main/ets/components/MessagesPage.ets",
       "buildFunction": "MessagesPageBuilder"
+    },
+    {
+      "name": "HomeSearchPage",
+      "pageSourceFile": "src/main/ets/components/HomeSearchPage.ets",
+      "buildFunction": "HomeSearchPageBuilder"
     }
   ]
 }

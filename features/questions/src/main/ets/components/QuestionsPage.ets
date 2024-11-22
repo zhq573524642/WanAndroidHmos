@@ -14,12 +14,12 @@ import {
   PageTitleComponent
 } from "lib_components"
 import mQuestionsViewModel from "../viewmodel/QuestionsViewModel"
-import { PlazaDataPage } from "./PlazaDataPage"
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 
 @Component
 export struct QuestionsPage {
   @Consume('questionsPathStack') questionsPathStack: NavPathStack
+  @Consume('appPathStack') appPathStack: NavPathStack
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
@@ -40,11 +40,12 @@ export struct QuestionsPage {
           isShowRightTexts: true,
           rightTexts: ['广场'],
           onRightTextClick: (title: ResourceStr, index: number) => {
-            PlazaDataPage.startPage()
+            this.appPathStack.pushPathByName('PlazaDataPage', '', true)
           }
         })
         BasePage({
           pageState: this.pageState,
+          isNeedRetry: true,
           refreshStatus: this.refreshStatus,
           loadMoreStatus: this.loadMoreStatus,
           msgError: this.msgError,
@@ -74,6 +75,9 @@ export struct QuestionsPage {
       .height('100%')
     }.hideTitleBar(true)
     .hideToolBar(true)
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight')
+    })
   }
 
   private requestQuestionsList() {
@@ -111,9 +115,10 @@ export struct QuestionsPage {
             item: item,
             onAuthorClick: (isAuthor: boolean) => {
               if (isAuthor) {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author,item.author)
+                CommonShareArticlePage.startPage(this.appPathStack, ArticleFromType.ArticleByAuthor, item.userId,
+                  '作者:' + item.author, item.author)
               } else {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId,
+                CommonShareArticlePage.startPage(this.appPathStack, ArticleFromType.ArticleByOther, item.userId,
                   '分享人:' + item.shareUser)
               }
             },
@@ -126,10 +131,10 @@ export struct QuestionsPage {
               //   new Object({
               //     articleDetail: item
               //   }), true);
-              WebViewPage.startPage('https://www.wanandroid.com/wenda/show/' + item.id)
+              WebViewPage.startPage(this.appPathStack, 'https://www.wanandroid.com/wenda/show/' + item.id)
             })
         }.margin({ left: 12, right: 12 })
-      }, (item: CommonArticlesBean) => item.id+'-'+item.collect)
+      }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
     }.width('100%')
   }
 

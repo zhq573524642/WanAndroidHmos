@@ -17,9 +17,8 @@ import mPlazaViewModel from "../viewmodel/PlazaViewModel"
 import { router } from "@kit.ArkUI"
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 
-@Entry({ routeName: 'PlazaDataPage' })
 @Component
-export struct PlazaDataPage {
+struct PlazaDataPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
@@ -28,51 +27,52 @@ export struct PlazaDataPage {
   @State dataList: LazyDataSource<CommonArticlesBean> = new LazyDataSource()
   @State cid: string = ''
   @State msgError: string = '数据异常'
-
-  static startPage() {
-    RouterUtil.pushNamedRoute('PlazaDataPage')
-  }
+  navPathStack: NavPathStack = new NavPathStack()
 
   aboutToAppear(): void {
     this.getPlazaList()
   }
 
   build() {
-    Column() {
-      PageTitleComponent({
-        title: '广场',
-        isShowLeftIcon: true,
-        onLeftIconClick: () => {
-          router.back()
-        }
-      })
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        msgError: this.msgError,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ContentListView(_scroller)
-        },
-        onRefreshing: () => {
-          this.pageIndex = 1
-          this.getPlazaList()
-        },
-        onLoadingMore: () => {
-          if (this.isAllLoadOver) {
-            ToastUtil.showToast('暂无更多数据')
-            this.loadMoreStatus = FooterLoadMoreStatus.hidden
-            return
+    NavDestination() {
+      Column() {
+        BasePage({
+          pageState: this.pageState,
+          isNeedRetry: true,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          msgError: this.msgError,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ContentListView(_scroller)
+          },
+          onRefreshing: () => {
+            this.pageIndex = 1
+            this.getPlazaList()
+          },
+          onLoadingMore: () => {
+            if (this.isAllLoadOver) {
+              ToastUtil.showToast('暂无更多数据')
+              this.loadMoreStatus = FooterLoadMoreStatus.hidden
+              return
+            }
+            this.getPlazaList()
+          },
+          onErrorRetryCallback: () => {
+            this.getPlazaList()
           }
-          this.getPlazaList()
-        },
-        onErrorRetryCallback: () => {
-          this.getPlazaList()
-        }
-      })
-    }.width('100%')
-    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
-    .height('100%')
+        })
+      }.width('100%')
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
+      .height('100%')
+    }.mode(NavDestinationMode.STANDARD)
+    .title('广场')
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context?.pathStack
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
   }
 
   @Builder
@@ -84,9 +84,10 @@ export struct PlazaDataPage {
             item: item,
             onArticleAuthorClick: (isAuthor: boolean) => {
               if (isAuthor) {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByAuthor, item.userId, '作者:' + item.author,item.author)
+                CommonShareArticlePage.startPage(this.navPathStack, ArticleFromType.ArticleByAuthor, item.userId,
+                  '作者:' + item.author, item.author)
               } else {
-                CommonShareArticlePage.startPage(ArticleFromType.ArticleByOther, item.userId,
+                CommonShareArticlePage.startPage(this.navPathStack, ArticleFromType.ArticleByOther, item.userId,
                   '分享人:' + item.shareUser)
               }
             },
@@ -95,7 +96,7 @@ export struct PlazaDataPage {
             }
           })
             .onClick(() => {
-              WebViewPage.startPage(item.link, true, item.title)
+              WebViewPage.startPage(this.navPathStack,item.link, true, item.title)
             })
             .margin({
               left: 15,
@@ -157,4 +158,9 @@ export struct PlazaDataPage {
         ToastUtil.showToast(msg)
       })
   }
+}
+
+@Builder
+export function PlazaDataPageBuilder() {
+  PlazaDataPage()
 }

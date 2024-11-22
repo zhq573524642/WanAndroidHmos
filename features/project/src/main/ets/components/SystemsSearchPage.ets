@@ -9,13 +9,8 @@ import mSystemsViewModel from "../viewmodel/SystemsViewModel";
 import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage";
 import { it } from "@ohos/hypium";
 
-@Entry({ routeName: 'SystemsSearchPage' })
 @Component
-export struct SystemsSearchPage {
-  static startPage() {
-    RouterUtil.pushNamedRoute('SystemsSearchPage')
-  }
-
+struct SystemsSearchPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.NORMAL
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.inactive
@@ -24,62 +19,70 @@ export struct SystemsSearchPage {
   @State isAllLoadOver: boolean = false
   @State inputContent: string = ''
   @State msgNoData: string = '未搜索到结果'
+  navPathStack: NavPathStack = new NavPathStack()
 
   build() {
-    Column() {
-      Row() {
-        Image($r('app.media.ic_back'))
-          .width(30)
-          .height(30)
-          .objectFit(ImageFit.Fill)
-          .onClick(() => {
-            router.back()
-          })
-        Search({ placeholder: '请输入作者昵称' })
-          .searchButton('搜索')
-          .fontColor(Color.Black)
-          .onSubmit((value: string) => {
-            if (value.length <= 0) {
-              ToastUtil.showToast('请输入作者昵称')
+    NavDestination() {
+      Column() {
+        BasePage({
+          pageState: this.pageState,
+          isNeedRetry: true,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          msgNoData: this.msgNoData,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ListView(_scroller)
+          },
+          onRefreshing: () => {
+            this.pageIndex = 0
+            this.requestSearch()
+          },
+          onLoadingMore: () => {
+            if (this.isAllLoadOver) {
+              this.loadMoreStatus = FooterLoadMoreStatus.inactive
+              ToastUtil.showToast('暂无更多数据')
               return
             }
-            this.inputContent = value
             this.requestSearch()
-          })
-          .height(50)
+          },
+          onErrorRetryCallback: () => {
+            this.requestSearch()
+          }
+        })
+          .width('100%')
+          .backgroundColor(FeatureUtils.getGrayBgColor())
           .layoutWeight(1)
-      }.padding({ left: 20, right: 20 })
-      .backgroundColor(Color.White)
+      }.width('100%')
+      .height('100%')
+    }.mode(NavDestinationMode.STANDARD)
+    .title(this.PageTitle())
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context?.pathStack
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
+  }
 
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        msgNoData: this.msgNoData,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ListView(_scroller)
-        },
-        onRefreshing: () => {
-          this.pageIndex = 0
-          this.requestSearch()
-        },
-        onLoadingMore: () => {
-          if (this.isAllLoadOver) {
-            this.loadMoreStatus = FooterLoadMoreStatus.inactive
-            ToastUtil.showToast('暂无更多数据')
+  @Builder
+  private PageTitle() {
+    Row() {
+      Search({ placeholder: '请输入作者昵称' })
+        .searchButton('搜索')
+        .fontColor(Color.Black)
+        .onSubmit((value: string) => {
+          if (value.length <= 0) {
+            ToastUtil.showToast('请输入作者昵称')
             return
           }
+          this.inputContent = value
           this.requestSearch()
-        },
-        onErrorRetryCallback: () => {
-          this.requestSearch()
-        }
-      })
-        .width('100%')
-        .backgroundColor(FeatureUtils.getGrayBgColor())
+        })
+        .height(50)
         .layoutWeight(1)
-    }.width('100%')
-    .height('100%')
+    }.padding({ left: 20, right: 20 })
+    .backgroundColor(Color.White)
   }
 
   private requestSearch() {
@@ -126,7 +129,7 @@ export struct SystemsSearchPage {
           bottom: 6
         })
         .onClick(() => {
-          WebViewPage.startPage(item.link, true, item.title)
+          WebViewPage.startPage(this.navPathStack,item.link, true, item.title)
         })
       }, (item: CommonArticlesBean) => item.id + '-' + item.collect)
     }.width('100%')
@@ -154,4 +157,9 @@ export struct SystemsSearchPage {
         ToastUtil.showToast(msg)
       })
   }
+}
+
+@Builder
+export function SystemsSearchPageBuilder() {
+  SystemsSearchPage()
 }

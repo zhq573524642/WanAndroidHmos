@@ -1,3 +1,4 @@
+import { CommonPageTitle } from "lib_components/src/main/ets/components/CommonStyles"
 import { MessageListPage } from "./MessageListPage"
 
 @Component
@@ -33,11 +34,14 @@ export struct MessagesPage {
 
       }.width('100%')
       .height('100%')
-    }.title('消息')
+    }.title(CommonPageTitle('消息'))
     .mode(NavDestinationMode.STANDARD)
     .onReady((context: NavDestinationContext) => {
       this.navPathStack = context?.pathStack
-
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
     })
   }
 

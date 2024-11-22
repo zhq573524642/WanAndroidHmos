@@ -8,11 +8,9 @@ import { IntegralBean } from "../model/IntegralBean"
 import mIntegralViewModel from "../viewmodel/IntegralViewModel"
 import { router } from "@kit.ArkUI"
 import { UserInfoBean } from "../model/UserInfoBean"
-import { IntegralRecordPage } from "./IntegralRecordPage"
 
-@Entry({ routeName: 'IntegralPage' })
 @Component
-export struct IntegralPage {
+struct IntegralPage {
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
@@ -20,10 +18,7 @@ export struct IntegralPage {
   @State pageIndex: number = 1
   @State isAllLoadOver: boolean = false
   @State userCoinInfo: IntegralBean = new IntegralBean()
-
-  static startPage() {
-    RouterUtil.pushNamedRoute('IntegralPage')
-  }
+  navPathStack: NavPathStack = new NavPathStack()
 
   aboutToAppear(): void {
     this.getIntegralRankList()
@@ -36,45 +31,59 @@ export struct IntegralPage {
   }
 
   build() {
-    Column() {
-      PageTitleComponent({
-        title: '积分',
-        isShowLeftIcon: true,
-        isShowRightTexts: true,
-        rightTexts: ['我的积分获取记录'],
-        onLeftIconClick: () => {
-          router.back()
-        },
-        onRightTextClick: (title: ResourceStr, index: number) => {
-          IntegralRecordPage.startPage()
-        }
-      })
-      BasePage({
-        pageState: this.pageState,
-        refreshStatus: this.refreshStatus,
-        loadMoreStatus: this.loadMoreStatus,
-        ContentViewPage: (_scroller: Scroller) => {
-          this.ContentView(_scroller)
-        },
-        onRefreshing: () => {
-          this.pageIndex = 1
-          this.getIntegralRankList()
-        },
-        onLoadingMore: () => {
-          if (this.isAllLoadOver) {
-            ToastUtil.showToast('暂无更多数据')
-            this.loadMoreStatus = FooterLoadMoreStatus.inactive
-            return
+    NavDestination() {
+      Column() {
+        BasePage({
+          pageState: this.pageState,
+          refreshStatus: this.refreshStatus,
+          loadMoreStatus: this.loadMoreStatus,
+          ContentViewPage: (_scroller: Scroller) => {
+            this.ContentView(_scroller)
+          },
+          onRefreshing: () => {
+            this.pageIndex = 1
+            this.getIntegralRankList()
+          },
+          onLoadingMore: () => {
+            if (this.isAllLoadOver) {
+              ToastUtil.showToast('暂无更多数据')
+              this.loadMoreStatus = FooterLoadMoreStatus.inactive
+              return
+            }
+            this.getIntegralRankList()
           }
-          this.getIntegralRankList()
-        }
-      })
-        .layoutWeight(1)
+        })
+          .layoutWeight(1)
 
-    }.width('100%')
-    .justifyContent(FlexAlign.Start)
-    .height('100%')
-    .backgroundColor(Color.White)
+      }.width('100%')
+      .justifyContent(FlexAlign.Start)
+      .height('100%')
+      .backgroundColor(Color.White)
+    }
+    .title(this.PageTitle())
+    .mode(NavDestinationMode.STANDARD)
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context?.pathStack
+    })
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
+
+
+  }
+
+  @Builder
+  PageTitle() {
+    PageTitleComponent({
+      title: '积分',
+      isShowLeftIcon: false,
+      isShowRightTexts: true,
+      rightTexts: ['我的积分获取记录'],
+      onRightTextClick: (title: ResourceStr, index: number) => {
+        this.navPathStack.pushPathByName('IntegralRecordPage','',true)
+      }
+    }).layoutWeight(1)
   }
 
   private getIntegralRankList() {
@@ -167,4 +176,9 @@ struct RankItemView {
       bottom: 15
     })
   }
+}
+
+@Builder
+export function IntegralPageBuilder() {
+  IntegralPage()
 }

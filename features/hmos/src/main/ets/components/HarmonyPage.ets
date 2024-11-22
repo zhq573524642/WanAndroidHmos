@@ -12,6 +12,8 @@ import { WebViewPage } from "lib_components/src/main/ets/components/WebViewPage"
 
 @Component
 export struct HarmonyPage {
+  @Consume('hmosPathStack') hmosPathStack: NavPathStack
+  @Consume('appPathStack') appPathStack: NavPathStack
   @State pageState: DefaultStateEnum = DefaultStateEnum.LOADING
   @State refreshStatus: HeaderRefreshStatus = HeaderRefreshStatus.inactive
   @State loadMoreStatus: FooterLoadMoreStatus = FooterLoadMoreStatus.hidden
@@ -34,6 +36,7 @@ export struct HarmonyPage {
       BasePage({
         pageState: this.pageState,
         msgError: this.msgError,
+        isNeedRetry: true,
         refreshStatus: this.refreshStatus,
         loadMoreStatus: this.loadMoreStatus,
         ContentViewPage: (_scroller: Scroller) => {
@@ -101,11 +104,11 @@ export struct HarmonyPage {
             return
           }
           let url = 'https://ohpm.openharmony.cn/#/cn/result?q=' + content
-          WebViewPage.startPage(url, true, '标题')
+          WebViewPage.startPage(this.appPathStack,url, true, '标题')
         })
 
       Row({ space: 10 }) {
-        ForEach(this.hotSearchArr, (item: string) => {
+        ForEach(this.hotSearchArr, (item: string, index: number) => {
           Text(item)
             .fontSize(13)
             .fontColor(Color.White)
@@ -118,14 +121,26 @@ export struct HarmonyPage {
               bottom: 3
             })
             .borderColor(Color.White)
+            .onClick(() => {
+              if (index == 0) {
+                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=ohos')
+              } else if (index == 1) {
+                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=axios')
+              } else {
+                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=http')
+              }
+            })
         }, (item: string) => item)
       }
       .margin({ top: 15 })
 
     }.width('100%')
-    .height(200)
+    .height(230)
     .alignItems(HorizontalAlign.Center)
     .backgroundColor('#262626')
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+    })
   }
 
   @Builder
@@ -141,7 +156,7 @@ export struct HarmonyPage {
           }
           .margin({ left: index % 2 == 0 ? 0 : 6, right: index % 2 == 0 ? 6 : 0 })
           .onClick(() => {
-            WebViewPage.startPage(item.link, true, item.title)
+            WebViewPage.startPage(this.appPathStack,item.link, true, item.title)
           })
         }, (item: CommonArticlesBean) => item.id + '')
       }.margin({ left: 20, right: 20 })
@@ -154,7 +169,7 @@ export struct HarmonyPage {
             })
           }.margin({ left: index % 2 == 0 ? 0 : 6, right: index % 2 == 0 ? 6 : 0 })
           .onClick(() => {
-            WebViewPage.startPage(item.link, true, item.title)
+            WebViewPage.startPage(this.appPathStack,item.link, true, item.title)
           })
         }, (item: CommonArticlesBean) => item.id + '')
       }.margin({ left: 20, right: 20 })
@@ -167,7 +182,7 @@ export struct HarmonyPage {
             })
           }.margin({ left: index % 2 == 0 ? 0 : 6, right: index % 2 == 0 ? 6 : 0 })
           .onClick(() => {
-            WebViewPage.startPage(item.link, true, item.title)
+            WebViewPage.startPage(this.appPathStack,item.link, true, item.title)
           })
         }, (item: CommonArticlesBean) => item.id + '')
       }.margin({ left: 20, right: 20 })

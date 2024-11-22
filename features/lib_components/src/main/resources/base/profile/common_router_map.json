@@ -1,0 +1,14 @@
+{
+  "routerMap": [
+    {
+      "name": "CommonShareArticlePage",
+      "pageSourceFile": "src/main/ets/components/CommonShareArticlePage.ets",
+      "buildFunction": "CommonShareArticlePageBuilder"
+    },
+    {
+      "name": "WebViewPage",
+      "pageSourceFile": "src/main/ets/components/WebViewPage.ets",
+      "buildFunction": "WebViewPageBuilder"
+    }
+  ]
+}

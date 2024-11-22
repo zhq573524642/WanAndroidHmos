@@ -105,7 +105,8 @@ export struct LoginPage {
           PreferenceManager.getInstance().setValue(AppConstant.KEY_USERNAME, data.username)
           PreferenceManager.getInstance().setValue(AppConstant.KEY_PASSWORD, data.password)
           PreferenceManager.getInstance().setValue(AppConstant.KEY_NICKNAME, data.nickname)
-          PreferenceManager.getInstance().setValue(AppConstant.IS_LOGIN, true)
+          PreferenceManager.getInstance().setValue(AppConstant.KEY_IS_LOGIN, true)
+          AppConstant.isLogin = true
           PreferenceManager.getInstance().setValue(AppConstant.KEY_USER_ID, data.id)
             .then(() => {
               EmitterUtils.getInstance().post(AppConstant.FLAG_LOGIN_SUCCESS)
