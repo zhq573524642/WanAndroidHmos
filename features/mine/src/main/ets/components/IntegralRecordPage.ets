@@ -26,13 +26,6 @@ export struct IntegralRecordPage {
   build() {
     NavDestination() {
       Column() {
-        PageTitleComponent({
-          title: '积分获取记录',
-          isShowLeftIcon: true,
-          onLeftIconClick: () => {
-            router.back()
-          }
-        })
         BasePage({
           pageState: this.pageState,
           isNeedRetry: true,

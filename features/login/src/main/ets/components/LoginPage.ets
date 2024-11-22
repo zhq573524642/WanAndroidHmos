@@ -58,8 +58,13 @@ export struct LoginPage {
       .justifyContent(FlexAlign.SpaceAround)
       .alignItems(HorizontalAlign.Center)
       .layoutWeight(1)
+
     }.backgroundColor('#c9eaf9')
     .width('100%')
+    .padding({
+      top: AppStorage.get<number>('statusBarHeight'),
+      bottom: AppStorage.get<number>('naviIndicatorHeight')
+    })
     .alignItems(HorizontalAlign.Start)
   }
 
