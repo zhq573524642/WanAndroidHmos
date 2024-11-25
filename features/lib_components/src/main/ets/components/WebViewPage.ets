@@ -45,6 +45,7 @@ export struct WebViewPage {
           //   return false
           // })
           // .onInterceptRequest((event:OnInterceptRequestEvent) => {
+          // //当Web组件加载url之前触发该回调，用于拦截url并返回响应数据
           //   return this.responseWeb
           // })
           // .onPageBegin((event: OnPageBeginEvent) => {
@@ -67,6 +68,10 @@ export struct WebViewPage {
             // .onLargestContentfulPaint((event:LargestContentfulPaint)=>{
             //   //网页绘制页面最大内容的回调函数
             // })
+          .javaScriptAccess(true)
+          .multiWindowAccess(true)//是否允许网页在新窗口打开
+          .allowWindowOpenMethod(true)//接口设置为true时，前端页面通过JavaScript函数调用的方式打开新窗口。
+          .domStorageAccess(true)//预览pdf需开启文档对象模型存储权限
           .width('100%')
           .layoutWeight(1)
 
@@ -83,6 +88,7 @@ export struct WebViewPage {
         this.webUrl = params.web_url as string
         this.isShowTitle = params.isShowTitle as boolean
         this.title = params.title as string
+        console.debug('===加载的网页：'+this.webUrl)
       }
     })
     .padding({

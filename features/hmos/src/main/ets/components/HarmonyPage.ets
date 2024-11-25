@@ -104,7 +104,7 @@ export struct HarmonyPage {
             return
           }
           let url = 'https://ohpm.openharmony.cn/#/cn/result?q=' + content
-          WebViewPage.startPage(this.appPathStack,url, true, '标题')
+          WebViewPage.startPage(this.appPathStack,url, true, content)
         })
 
       Row({ space: 10 }) {
@@ -123,11 +123,11 @@ export struct HarmonyPage {
             .borderColor(Color.White)
             .onClick(() => {
               if (index == 0) {
-                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=ohos')
+                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=ohos',true,'ohos')
               } else if (index == 1) {
-                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=axios')
+                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=axios',true,'axios')
               } else {
-                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=http')
+                WebViewPage.startPage(this.appPathStack,'https://ohpm.openharmony.cn/#/cn/result?q=http',true,'http')
               }
             })
         }, (item: string) => item)
